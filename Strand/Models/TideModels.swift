@@ -28,7 +28,7 @@ struct IHMMarea: Codable {
 
 // MARK: - App Domain Models
 
-enum TideType: String, CaseIterable {
+enum TideType: String, CaseIterable, Codable {
     case highTide = "pleamar"
     case lowTide = "bajamar"
 

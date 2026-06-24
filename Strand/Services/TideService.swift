@@ -91,14 +91,14 @@ actor TideService {
 
     // MARK: - Parsing
 
-    private func parseDay(from mareas: IHMMareas, referenceDate: Date, timeOffsetMinutes: Int) -> TideDay {
+    nonisolated private func parseDay(from mareas: IHMMareas, referenceDate: Date, timeOffsetMinutes: Int) -> TideDay {
         var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = Self.canaryIslandsTimeZone
+        cal.timeZone = TideService.canaryIslandsTimeZone
 
         let events: [TideEvent] = mareas.datos.marea.compactMap { marea in
             guard let tideType = TideType(rawValue: marea.tipo),
                   let height = Double(marea.altura),
-                  let originalTime = parseTime(marea.hora, referenceDate: referenceDate, calendar: cal)
+                  let originalTime = Self.parseTime(marea.hora, referenceDate: referenceDate, calendar: cal)
             else { return nil }
 
             let adjustedTime = Calendar.current.date(
@@ -116,7 +116,7 @@ actor TideService {
         return TideDay(date: referenceDate, events: events.sorted { $0.adjustedTime < $1.adjustedTime })
     }
 
-    private func parseTime(_ timeString: String, referenceDate: Date, calendar: Calendar) -> Date? {
+    nonisolated private static func parseTime(_ timeString: String, referenceDate: Date, calendar: Calendar) -> Date? {
         let parts = timeString.split(separator: ":").compactMap { Int($0) }
         guard parts.count == 2 else { return nil }
         var components = calendar.dateComponents([.year, .month, .day], from: referenceDate)
