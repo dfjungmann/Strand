@@ -43,9 +43,11 @@ private struct OpenMeteoDailyData: Codable {
 actor WeatherService {
     static let shared = WeatherService()
 
-    // Playa del Aguila, Gran Canaria
-    private let latitude  = 27.754
-    private let longitude = -15.571
+    // Playa del Inglés, southern Gran Canaria — chosen for its distinct microclimate:
+    // the south enjoys consistent sunshine and low rainfall year-round, unlike the
+    // cloudier, wetter north of the island.
+    private let latitude  = 27.763
+    private let longitude = -15.556
     private let baseURL   = "https://api.open-meteo.com/v1/forecast"
 
     private let session: URLSession = {
