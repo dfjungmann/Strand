@@ -8,6 +8,8 @@ struct WeatherDay: Identifiable {
     let maxTemp: Double       // °C
     let minTemp: Double       // °C
     let precipProb: Int       // 0–100 %
+    let sunshineHours: Double // h/day
+    let cloudCover: Int       // 0–100 %
 
     var precipColor: String {
         switch precipProb {
@@ -29,12 +31,16 @@ private struct OpenMeteoDailyData: Codable {
     let temperature2mMax: [Double?]
     let temperature2mMin: [Double?]
     let precipitationProbabilityMax: [Int?]
+    let sunshineDuration: [Double?]       // seconds
+    let cloudCoverMean: [Int?]            // %
 
     enum CodingKeys: String, CodingKey {
         case time
-        case temperature2mMax              = "temperature_2m_max"
-        case temperature2mMin              = "temperature_2m_min"
-        case precipitationProbabilityMax   = "precipitation_probability_max"
+        case temperature2mMax             = "temperature_2m_max"
+        case temperature2mMin             = "temperature_2m_min"
+        case precipitationProbabilityMax  = "precipitation_probability_max"
+        case sunshineDuration             = "sunshine_duration"
+        case cloudCoverMean               = "cloud_cover_mean"
     }
 }
 
@@ -61,7 +67,7 @@ actor WeatherService {
         comps.queryItems = [
             URLQueryItem(name: "latitude",    value: String(latitude)),
             URLQueryItem(name: "longitude",   value: String(longitude)),
-            URLQueryItem(name: "daily",       value: "temperature_2m_max,temperature_2m_min,precipitation_probability_max"),
+            URLQueryItem(name: "daily",       value: "temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunshine_duration,cloud_cover_mean"),
             URLQueryItem(name: "timezone",    value: "Atlantic/Canary"),
             URLQueryItem(name: "forecast_days", value: String(days))
         ]
@@ -90,8 +96,11 @@ actor WeatherService {
                   let maxT    = daily.temperature2mMax[safe: idx] ?? nil,
                   let minT    = daily.temperature2mMin[safe: idx] ?? nil
             else { return nil }
-            let precip = daily.precipitationProbabilityMax[safe: idx].flatMap { $0 } ?? 0
-            return WeatherDay(date: date, maxTemp: maxT, minTemp: minT, precipProb: precip)
+            let precip   = daily.precipitationProbabilityMax[safe: idx].flatMap { $0 } ?? 0
+            let sunshine = (daily.sunshineDuration[safe: idx].flatMap { $0 } ?? 0) / 3600.0
+            let cloud    = daily.cloudCoverMean[safe: idx].flatMap { $0 } ?? 0
+            return WeatherDay(date: date, maxTemp: maxT, minTemp: minT,
+                              precipProb: precip, sunshineHours: sunshine, cloudCover: cloud)
         }
     }
 }

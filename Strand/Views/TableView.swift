@@ -94,6 +94,15 @@ struct CompactDayRow: View {
         }
     }
 
+    private func cloudIcon(_ cover: Int) -> String {
+        switch cover {
+        case 0..<20:  return "sun.max.fill"
+        case 20..<50: return "cloud.sun.fill"
+        case 50..<80: return "cloud.fill"
+        default:      return "cloud.heavyrain.fill"
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
 
@@ -177,22 +186,28 @@ struct CompactDayRow: View {
 
             // ── Wetter ──
             if let wx = viewModel.weather(for: day.date) {
-                HStack(spacing: 16) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "thermometer.medium")
-                            .foregroundStyle(.red)
-                        Text("\(Int(wx.maxTemp.rounded()))°")
-                            .foregroundStyle(.red)
-                        Text("/")
-                            .foregroundStyle(.secondary)
-                        Text("\(Int(wx.minTemp.rounded()))°")
-                            .foregroundStyle(.blue)
+                HStack(spacing: 14) {
+                    // Temperatur
+                    HStack(spacing: 3) {
+                        Image(systemName: "thermometer.medium").foregroundStyle(.red)
+                        Text("\(Int(wx.maxTemp.rounded()))°").foregroundStyle(.red)
+                        Text("/").foregroundStyle(.secondary)
+                        Text("\(Int(wx.minTemp.rounded()))°").foregroundStyle(.blue)
                     }
-                    HStack(spacing: 4) {
-                        Image(systemName: "drop.fill")
-                            .foregroundStyle(precipColor(wx.precipProb))
-                        Text("\(wx.precipProb) %")
-                            .foregroundStyle(precipColor(wx.precipProb))
+                    // Regen
+                    HStack(spacing: 3) {
+                        Image(systemName: "drop.fill").foregroundStyle(precipColor(wx.precipProb))
+                        Text("\(wx.precipProb) %").foregroundStyle(precipColor(wx.precipProb))
+                    }
+                    // Sonnenstunden
+                    HStack(spacing: 3) {
+                        Image(systemName: "sun.max.fill").foregroundStyle(.yellow)
+                        Text(String(format: "%.1f h", wx.sunshineHours)).foregroundStyle(.primary)
+                    }
+                    // Bewölkung
+                    HStack(spacing: 3) {
+                        Image(systemName: cloudIcon(wx.cloudCover)).foregroundStyle(.gray)
+                        Text("\(wx.cloudCover) %").foregroundStyle(.secondary)
                     }
                     Spacer()
                 }
