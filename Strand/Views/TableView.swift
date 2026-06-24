@@ -18,6 +18,7 @@ struct TableView: View {
             .navigationBarTitleDisplayMode(.large)
             .sheet(item: $selectedDay) { day in
                 DayDetailView(day: day, viewModel: viewModel)
+                    .interactiveDismissDisabled(false)
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
