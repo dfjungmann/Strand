@@ -103,6 +103,15 @@ struct CompactDayRow: View {
         }
     }
 
+    private func cloudColor(_ cover: Int) -> Color {
+        switch cover {
+        case 0..<20:  return .yellow
+        case 20..<50: return .orange
+        case 50..<80: return .gray
+        default:      return .blue
+        }
+    }
+
     private func cloudLabel(_ cover: Int) -> String {
         switch cover {
         case 0..<20:  return "sonnig"
@@ -215,7 +224,8 @@ struct CompactDayRow: View {
                     }
                     // Bewölkung
                     HStack(spacing: 3) {
-                        Image(systemName: cloudIcon(wx.cloudCover)).foregroundStyle(.gray)
+                        Image(systemName: cloudIcon(wx.cloudCover))
+                            .foregroundStyle(cloudColor(wx.cloudCover))
                         Text("\(wx.cloudCover) %").foregroundStyle(.secondary)
                         Text(cloudLabel(wx.cloudCover)).foregroundStyle(.secondary)
                     }
