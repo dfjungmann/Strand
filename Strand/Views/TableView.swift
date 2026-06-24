@@ -103,6 +103,15 @@ struct CompactDayRow: View {
         }
     }
 
+    private func cloudLabel(_ cover: Int) -> String {
+        switch cover {
+        case 0..<20:  return "sonnig"
+        case 20..<50: return "teils bewölkt"
+        case 50..<80: return "bewölkt"
+        default:      return "stark bewölkt"
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
 
@@ -208,6 +217,7 @@ struct CompactDayRow: View {
                     HStack(spacing: 3) {
                         Image(systemName: cloudIcon(wx.cloudCover)).foregroundStyle(.gray)
                         Text("\(wx.cloudCover) %").foregroundStyle(.secondary)
+                        Text(cloudLabel(wx.cloudCover)).foregroundStyle(.secondary)
                     }
                     Spacer()
                 }
