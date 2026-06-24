@@ -7,14 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		070CDFD1F7AC04313C762B03 /* BeachWalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */; };
 		17E9C8DD1F965D0BDFEFDF14 /* StrandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098356A9AD4ECC4271276BAD /* StrandApp.swift */; };
 		1B1399EDF0D0A6181C31CD30 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAE6690AE9518CC7E7A0215 /* ContentView.swift */; };
+		5B898008E639EC3E8A4EEE38 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FB5ACC469E5D5636D23FC8 /* ChartView.swift */; };
+		94362AF0DA705C14FA45AD44 /* TideViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43493A1B112812438249B6F3 /* TideViewModel.swift */; };
+		9710D1C6517102085CDA3038 /* TideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA039B176B6568DDD9B77A63 /* TideModels.swift */; };
+		A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E08E74456BF3AC82D99827E /* TableView.swift */; };
+		D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */; };
+		DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA028AEAC3247188CB0EB539 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		098356A9AD4ECC4271276BAD /* StrandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrandApp.swift; sourceTree = "<group>"; };
+		18FB5ACC469E5D5636D23FC8 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		1F455BDF21623385D050052D /* Strand.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeachWalkView.swift; sourceTree = "<group>"; };
+		43493A1B112812438249B6F3 /* TideViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideViewModel.swift; sourceTree = "<group>"; };
+		4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideService.swift; sourceTree = "<group>"; };
+		8E08E74456BF3AC82D99827E /* TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
+		EA028AEAC3247188CB0EB539 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		EDAE6690AE9518CC7E7A0215 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		FA039B176B6568DDD9B77A63 /* TideModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideModels.swift; sourceTree = "<group>"; };
 		FA55C59034089AD3E6C16D63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -27,14 +41,45 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		05B72E7FF27E6E92C1BD8432 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */,
+				18FB5ACC469E5D5636D23FC8 /* ChartView.swift */,
+				EA028AEAC3247188CB0EB539 /* SettingsView.swift */,
+				8E08E74456BF3AC82D99827E /* TableView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		4B3D27C5CF4E00E9334AB072 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				FA039B176B6568DDD9B77A63 /* TideModels.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
 		4C3F8EB3C8A0C8E14C9B5131 /* Strand */ = {
 			isa = PBXGroup;
 			children = (
 				EDAE6690AE9518CC7E7A0215 /* ContentView.swift */,
 				FA55C59034089AD3E6C16D63 /* Info.plist */,
 				098356A9AD4ECC4271276BAD /* StrandApp.swift */,
+				4B3D27C5CF4E00E9334AB072 /* Models */,
+				BDDE950AC30C6FA45EB64D8D /* Services */,
+				5586DBC263A4932566673FDC /* ViewModels */,
+				05B72E7FF27E6E92C1BD8432 /* Views */,
 			);
 			path = Strand;
+			sourceTree = "<group>";
+		};
+		5586DBC263A4932566673FDC /* ViewModels */ = {
+			isa = PBXGroup;
+			children = (
+				43493A1B112812438249B6F3 /* TideViewModel.swift */,
+			);
+			path = ViewModels;
 			sourceTree = "<group>";
 		};
 		98675DE8264E7501253BBBCA = {
@@ -43,6 +88,14 @@
 				4C3F8EB3C8A0C8E14C9B5131 /* Strand */,
 				0497C8EA52DF82EAD330F728 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		BDDE950AC30C6FA45EB64D8D /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */,
+			);
+			path = Services;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -103,8 +156,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				070CDFD1F7AC04313C762B03 /* BeachWalkView.swift in Sources */,
+				5B898008E639EC3E8A4EEE38 /* ChartView.swift in Sources */,
 				1B1399EDF0D0A6181C31CD30 /* ContentView.swift in Sources */,
+				DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */,
 				17E9C8DD1F965D0BDFEFDF14 /* StrandApp.swift in Sources */,
+				A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */,
+				9710D1C6517102085CDA3038 /* TideModels.swift in Sources */,
+				D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */,
+				94362AF0DA705C14FA45AD44 /* TideViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -33,6 +33,12 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: false
+          NSExceptionDomains:
+            ideihm.covam.es:
+              NSExceptionAllowsInsecureHTTPLoads: false
+              NSIncludesSubdomains: true
     settings:
       base:
         INFOPLIST_FILE: Strand/Info.plist
