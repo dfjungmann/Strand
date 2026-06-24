@@ -47,7 +47,7 @@ enum TideType: String, CaseIterable {
     }
 }
 
-struct TideEvent: Identifiable {
+struct TideEvent: Identifiable, Equatable {
     let id = UUID()
     let originalTime: Date
     let adjustedTime: Date
@@ -62,7 +62,7 @@ struct TideEvent: Identifiable {
     }
 }
 
-struct TideDay: Identifiable {
+struct TideDay: Identifiable, Equatable {
     let id = UUID()
     let date: Date
     var events: [TideEvent]

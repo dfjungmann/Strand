@@ -46,7 +46,7 @@ struct ChartView: View {
                 selectedDay = viewModel.tideDays.first
             }
         }
-        .onChange(of: viewModel.tideDays) {
+        .onChange(of: viewModel.tideDays.count) {
             if selectedDay == nil || !viewModel.tideDays.contains(where: { $0.id == selectedDay?.id }) {
                 selectedDay = viewModel.tideDays.first
             }
