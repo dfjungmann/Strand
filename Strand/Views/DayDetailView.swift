@@ -222,23 +222,28 @@ struct DayDetailView: View {
 
     // MARK: - X-Axis Helpers
 
+    /// Marks every 12 hours, snapped to midnight/noon
     private var xAxisValues: [Date] {
-        guard let first = twoDays.first?.events.first?.adjustedTime,
-              let last  = twoDays.last?.events.last?.adjustedTime else { return [] }
-        var dates: [Date] = []
-        var current = Calendar.current.date(bySetting: .minute, value: 0, of: first)!
-        while current <= last {
-            dates.append(current)
-            current = Calendar.current.date(byAdding: .hour, value: 6, to: current)!
-        }
-        return dates
+        guard let startDay = twoDays.first?.date else { return [] }
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TideService.canaryIslandsTimeZone
+        let midnight = cal.startOfDay(for: startDay)
+        // 0h, 12h, 24h, 36h, 48h  → 5 clean marks
+        return (0...4).map { cal.date(byAdding: .hour, value: $0 * 12, to: midnight)! }
     }
 
     private func xLabel(_ date: Date) -> String {
-        let f = DateFormatter()
-        f.dateFormat = "EE HH:mm"
-        f.locale = Locale(identifier: "de_DE")
-        f.timeZone = TideService.canaryIslandsTimeZone
-        return f.string(from: date)
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TideService.canaryIslandsTimeZone
+        let hour = cal.component(.hour, from: date)
+
+        let dayFmt = DateFormatter()
+        dayFmt.dateFormat = "EE"
+        dayFmt.locale = Locale(identifier: "de_DE")
+        dayFmt.timeZone = TideService.canaryIslandsTimeZone
+        let dayStr = dayFmt.string(from: date)
+
+        // midnight → "Di." / "Mi." ; noon → "12:00"
+        return hour == 0 ? dayStr : "\(hour):00"
     }
 }
