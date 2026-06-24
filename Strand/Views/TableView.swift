@@ -86,6 +86,14 @@ struct CompactDayRow: View {
         AstronomyService.data(for: day.date)
     }
 
+    private func precipColor(_ prob: Int) -> Color {
+        switch prob {
+        case 0..<20:  return .green
+        case 20..<50: return .orange
+        default:      return .blue
+        }
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
 
@@ -149,28 +157,47 @@ struct CompactDayRow: View {
             HStack(spacing: 16) {
                 if let rise = astronomy.sunrise {
                     HStack(spacing: 4) {
-                        Image(systemName: "sunrise.fill")
-                            .foregroundStyle(.yellow)
-                        Text(viewModel.formatTime(rise))
-                            .monospacedDigit()
+                        Image(systemName: "sunrise.fill").foregroundStyle(.yellow)
+                        Text(viewModel.formatTime(rise)).monospacedDigit()
                     }
                 }
                 if let set = astronomy.sunset {
                     HStack(spacing: 4) {
-                        Image(systemName: "sunset.fill")
-                            .foregroundStyle(.orange)
-                        Text(viewModel.formatTime(set))
-                            .monospacedDigit()
+                        Image(systemName: "sunset.fill").foregroundStyle(.orange)
+                        Text(viewModel.formatTime(set)).monospacedDigit()
                     }
                 }
                 Spacer()
                 HStack(spacing: 4) {
                     Text(astronomy.moonPhase.emoji)
-                    Text(astronomy.moonPhase.rawValue)
-                        .foregroundStyle(.secondary)
+                    Text(astronomy.moonPhase.rawValue).foregroundStyle(.secondary)
                 }
             }
             .font(.caption)
+
+            // ── Wetter ──
+            if let wx = viewModel.weather(for: day.date) {
+                HStack(spacing: 16) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "thermometer.medium")
+                            .foregroundStyle(.red)
+                        Text("\(Int(wx.maxTemp.rounded()))°")
+                            .foregroundStyle(.red)
+                        Text("/")
+                            .foregroundStyle(.secondary)
+                        Text("\(Int(wx.minTemp.rounded()))°")
+                            .foregroundStyle(.blue)
+                    }
+                    HStack(spacing: 4) {
+                        Image(systemName: "drop.fill")
+                            .foregroundStyle(precipColor(wx.precipProb))
+                        Text("\(wx.precipProb) %")
+                            .foregroundStyle(precipColor(wx.precipProb))
+                    }
+                    Spacer()
+                }
+                .font(.caption)
+            }
 
             Divider()
                 .padding(.top, 2)

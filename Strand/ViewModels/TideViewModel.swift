@@ -41,6 +41,7 @@ final class TideViewModel {
     // MARK: - State
 
     var tideDays: [TideDay] = []
+    var weatherDays: [WeatherDay] = []
     var isLoading = false
     var errorMessage: String?
     var lastUpdated: Date?
@@ -74,24 +75,30 @@ final class TideViewModel {
     func loadTides() async {
         isLoading = true
         errorMessage = nil
+        async let tideFetch = TideService.shared.fetchTides(
+            forDays: Self.totalDays,
+            timeOffsetMinutes: timeOffsetMinutes
+        )
+        async let weatherFetch = WeatherService.shared.fetchWeather(days: Self.totalDays)
+
         do {
-            var days = try await TideService.shared.fetchTides(
-                forDays: Self.totalDays,
-                timeOffsetMinutes: timeOffsetMinutes
-            )
+            var days = try await tideFetch
             days = applyBeachWalkPrediction(to: days)
             tideDays = days
-            lastUpdated = Date()
             cachedDayCount = await TideCache.shared.cachedDayCount
         } catch {
             errorMessage = error.localizedDescription
         }
+        // Weather failures are non-fatal
+        weatherDays = (try? await weatherFetch) ?? []
+        lastUpdated = Date()
         isLoading = false
     }
 
     @MainActor
     func reload() async {
         tideDays = []
+        weatherDays = []
         await loadTides()
     }
 
@@ -128,6 +135,16 @@ final class TideViewModel {
 
     /// Convenience: old single threshold, kept for BeachWalkView gauge
     var beachWalkThreshold: Double { beachWalkThresholdSafe }
+
+    // MARK: - Weather Lookup
+
+    func weather(for date: Date) -> WeatherDay? {
+        let canary = TideService.canaryIslandsTimeZone
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = canary
+        let target = cal.startOfDay(for: date)
+        return weatherDays.first { cal.startOfDay(for: $0.date) == target }
+    }
 
     // MARK: - Chart Data
 
