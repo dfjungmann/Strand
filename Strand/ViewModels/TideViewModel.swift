@@ -6,13 +6,19 @@ final class TideViewModel {
 
     // MARK: - Constants
 
-    static let totalDays = 7          // always fetch & show 7 days
+    static let totalDays = 10         // always fetch & show 10 days
     static let chartDayOptions = Array(1...7)
+    static let chartStartOptions: [(offset: Int, label: String)] = [
+        (0, "Heute"), (1, "Morgen"), (2, "Übermorgen")
+    ]
 
     // MARK: - Settings (persisted)
 
     var chartDays: Int {
         didSet { UserDefaults.standard.set(chartDays, forKey: "chartDays") }
+    }
+    var chartStartOffset: Int {
+        didSet { UserDefaults.standard.set(chartStartOffset, forKey: "chartStartOffset") }
     }
     var timeOffsetMinutes: Int {
         didSet { UserDefaults.standard.set(timeOffsetMinutes, forKey: "timeOffsetMinutes") }
@@ -34,6 +40,9 @@ final class TideViewModel {
     init() {
         let storedChart = UserDefaults.standard.integer(forKey: "chartDays")
         chartDays = (1...7).contains(storedChart) ? storedChart : 3
+
+        let storedOffset = UserDefaults.standard.integer(forKey: "chartStartOffset")
+        chartStartOffset = (0...2).contains(storedOffset) ? storedOffset : 0
 
         let storedOffset = UserDefaults.standard.object(forKey: "timeOffsetMinutes") as? Int
         timeOffsetMinutes = storedOffset ?? -15
@@ -92,9 +101,10 @@ final class TideViewModel {
 
     // MARK: - Chart Data
 
-    /// Days shown in chart (first `chartDays` of the loaded 7 days)
+    /// Days shown in chart: `chartDays` days starting from `chartStartOffset`
     var chartDisplayDays: [TideDay] {
-        Array(tideDays.prefix(chartDays))
+        let start = min(chartStartOffset, max(0, tideDays.count - 1))
+        return Array(tideDays.dropFirst(start).prefix(chartDays))
     }
 
     /// Continuous sinusoidal interpolation across multiple days for the chart

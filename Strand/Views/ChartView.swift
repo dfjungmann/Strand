@@ -34,15 +34,11 @@ struct ChartView: View {
         }
     }
 
-    // MARK: - Days Picker (1–7 Tage)
+    // MARK: - Days Picker (zwei Zeilen)
 
     private var daysPicker: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Angezeigter Zeitraum")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 4)
-
+            // Zeile 1: Anzahl Tage
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(TideViewModel.chartDayOptions, id: \.self) { n in
@@ -63,6 +59,27 @@ struct ChartView: View {
                 }
                 .padding(.horizontal, 4)
             }
+
+            // Zeile 2: Starttag
+            HStack(spacing: 8) {
+                ForEach(TideViewModel.chartStartOptions, id: \.offset) { option in
+                    let isSelected = viewModel.chartStartOffset == option.offset
+                    Button {
+                        viewModel.chartStartOffset = option.offset
+                    } label: {
+                        Text(option.label)
+                            .font(.subheadline)
+                            .fontWeight(isSelected ? .semibold : .regular)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(isSelected ? Color.orange : Color(.systemGray6))
+                            .foregroundStyle(isSelected ? .white : .primary)
+                            .clipShape(Capsule())
+                    }
+                }
+                Spacer()
+            }
+            .padding(.horizontal, 4)
         }
     }
 
