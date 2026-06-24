@@ -27,51 +27,39 @@ struct TableView: View {
         }
     }
 
-    // MARK: - Subviews
+    // MARK: - List
 
     private var tideList: some View {
         List {
             ForEach(viewModel.tideDays) { day in
-                Section {
-                    ForEach(day.events) { event in
-                        TideEventRow(event: event, viewModel: viewModel)
-                    }
-                } header: {
-                    DaySectionHeader(day: day, viewModel: viewModel)
-                }
+                CompactDayRow(day: day, viewModel: viewModel)
+                    .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
             }
 
             Section {
-                footerInfo
+                HStack {
+                    Image(systemName: "info.circle")
+                        .font(.caption)
+                    Text("Puerto de la Luz\(offsetDescription) · Kanarische Zeit")
+                        .font(.caption)
+                }
+                .foregroundStyle(.secondary)
+                .listRowBackground(Color.clear)
             }
         }
-        .listStyle(.insetGrouped)
-    }
-
-    private var footerInfo: some View {
-        HStack {
-            Image(systemName: "info.circle")
-                .foregroundStyle(.secondary)
-                .font(.caption)
-            Text("Zeiten: Puerto de la Luz \(offsetDescription). Kanarische Zeit.")
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .padding(.vertical, 4)
+        .listStyle(.plain)
     }
 
     private var offsetDescription: String {
         let offset = viewModel.timeOffsetMinutes
-        if offset == 0 { return "" }
-        return offset < 0 ? "−\(abs(offset)) Min." : "+\(offset) Min."
+        guard offset != 0 else { return "" }
+        return offset < 0 ? " −\(abs(offset)) Min." : " +\(offset) Min."
     }
 
     private var loadingView: some View {
         VStack(spacing: 16) {
-            ProgressView()
-                .scaleEffect(1.5)
-            Text("Lade Gezeitendaten…")
-                .foregroundStyle(.secondary)
+            ProgressView().scaleEffect(1.5)
+            Text("Lade Gezeitendaten…").foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
@@ -85,9 +73,7 @@ struct TableView: View {
     }
 
     private var refreshButton: some View {
-        Button {
-            Task { await viewModel.reload() }
-        } label: {
+        Button { Task { await viewModel.reload() } } label: {
             Image(systemName: "arrow.clockwise")
         }
     }
@@ -103,91 +89,78 @@ struct TableView: View {
         } label: {
             HStack(spacing: 4) {
                 Text("\(viewModel.selectedDays) Tage")
-                Image(systemName: "chevron.down")
-                    .font(.caption)
+                Image(systemName: "chevron.down").font(.caption)
             }
             .font(.subheadline)
         }
     }
 }
 
-// MARK: - Tide Event Row
+// MARK: - Compact Day Row
 
-struct TideEventRow: View {
-    let event: TideEvent
-    let viewModel: TideViewModel
-
-    var body: some View {
-        HStack(spacing: 12) {
-            // Type icon
-            Image(systemName: event.type.symbol)
-                .font(.title2)
-                .foregroundStyle(iconColor)
-                .frame(width: 32)
-
-            // Time
-            VStack(alignment: .leading, spacing: 2) {
-                Text(viewModel.formatTime(event.adjustedTime))
-                    .font(.headline)
-                    .monospacedDigit()
-                Text(event.type.displayName)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-
-            Spacer()
-
-            // Height
-            VStack(alignment: .trailing, spacing: 2) {
-                Text(event.heightFormatted)
-                    .font(.headline)
-                    .monospacedDigit()
-                if event.isBeachWalkPossible {
-                    beachBadge
-                }
-            }
-        }
-        .padding(.vertical, 2)
-    }
-
-    private var iconColor: Color {
-        switch event.type {
-        case .highTide: return .blue
-        case .lowTide: return .orange
-        }
-    }
-
-    private var beachBadge: some View {
-        HStack(spacing: 3) {
-            Image(systemName: "figure.walk")
-            Text("Strandgang")
-        }
-        .font(.caption2)
-        .padding(.horizontal, 6)
-        .padding(.vertical, 2)
-        .background(Color.green.opacity(0.15))
-        .foregroundStyle(.green)
-        .clipShape(Capsule())
-    }
-}
-
-// MARK: - Day Section Header
-
-struct DaySectionHeader: View {
+struct CompactDayRow: View {
     let day: TideDay
     let viewModel: TideViewModel
 
     var body: some View {
-        HStack {
-            Text(viewModel.formatDayHeader(day.date))
-                .font(.subheadline)
-                .fontWeight(.semibold)
-            Spacer()
-            if day.hasBeachWalkOpportunity {
-                Image(systemName: "sun.and.horizon.fill")
-                    .foregroundStyle(.orange)
-                    .font(.caption)
+        VStack(alignment: .leading, spacing: 5) {
+
+            // ── Tag-Header ──
+            HStack {
+                Text(viewModel.formatDayHeader(day.date))
+                    .font(.subheadline)
+                    .fontWeight(.semibold)
+                Spacer()
+                if day.hasBeachWalkOpportunity {
+                    HStack(spacing: 3) {
+                        Image(systemName: "figure.walk")
+                        Text("Strandgang")
+                    }
+                    .font(.caption2)
+                    .padding(.horizontal, 7)
+                    .padding(.vertical, 3)
+                    .background(Color.green.opacity(0.15))
+                    .foregroundStyle(.green)
+                    .clipShape(Capsule())
+                }
             }
+
+            // ── Zeiten-Zeile ──
+            HStack(spacing: 0) {
+                ForEach(day.events) { event in
+                    HStack(spacing: 3) {
+                        Image(systemName: event.type == .highTide ? "arrow.up" : "arrow.down")
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundStyle(event.type == .highTide ? Color.blue : Color.orange)
+                        Text(viewModel.formatTime(event.adjustedTime))
+                            .font(.system(size: 14, weight: .medium).monospacedDigit())
+                            .foregroundStyle(.primary)
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+
+            // ── Höhen-Zeile ──
+            HStack(spacing: 0) {
+                ForEach(day.events) { event in
+                    HStack(spacing: 0) {
+                        Text(event.heightFormatted)
+                            .font(.system(size: 13).monospacedDigit())
+                            .foregroundStyle(event.type == .highTide ? Color.blue : Color.orange)
+                        if event.isBeachWalkPossible {
+                            Image(systemName: "figure.walk")
+                                .font(.system(size: 9))
+                                .foregroundStyle(.green)
+                                .padding(.leading, 2)
+                        }
+                    }
+                    .frame(maxWidth: .infinity)
+                }
+            }
+
+            Divider()
+                .padding(.top, 2)
         }
+        .padding(.vertical, 2)
     }
 }
