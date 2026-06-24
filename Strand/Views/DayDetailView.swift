@@ -130,6 +130,20 @@ private struct DayDetailContent: View {
                     Text("Wahrsch. \(String(format: "%.1f m", viewModel.beachWalkThresholdLikely))")
                         .font(.caption2).foregroundStyle(.orange).padding(.trailing, 4)
                 }
+            // Beach walk windows (±1.5h around qualifying low tides)
+            ForEach(events.filter { $0.type == .lowTide && $0.beachWalkStatus != .none }) { e in
+                let start = e.adjustedTime.addingTimeInterval(-90 * 60)
+                let end   = e.adjustedTime.addingTimeInterval( 90 * 60)
+                let color: Color = e.beachWalkStatus == .safe ? .green : .yellow
+                RectangleMark(
+                    xStart: .value("Start", start),
+                    xEnd:   .value("End",   end),
+                    yStart: .value("0",     0.0),
+                    yEnd:   .value("Top",   maxH)
+                )
+                .foregroundStyle(color.opacity(0.18))
+            }
+
             ForEach(points) { p in
                 AreaMark(x: .value("Zeit", p.time), yStart: .value("0", 0), yEnd: .value("H", p.height))
                     .foregroundStyle(.linearGradient(
