@@ -14,6 +14,7 @@
 		94362AF0DA705C14FA45AD44 /* TideViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43493A1B112812438249B6F3 /* TideViewModel.swift */; };
 		9710D1C6517102085CDA3038 /* TideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA039B176B6568DDD9B77A63 /* TideModels.swift */; };
 		A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E08E74456BF3AC82D99827E /* TableView.swift */; };
+		B62362ECC5E270434E48CAF2 /* TideCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */; };
 		D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */; };
 		DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA028AEAC3247188CB0EB539 /* SettingsView.swift */; };
 /* End PBXBuildFile section */
@@ -26,6 +27,7 @@
 		43493A1B112812438249B6F3 /* TideViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideViewModel.swift; sourceTree = "<group>"; };
 		4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideService.swift; sourceTree = "<group>"; };
 		8E08E74456BF3AC82D99827E /* TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
+		DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideCache.swift; sourceTree = "<group>"; };
 		EA028AEAC3247188CB0EB539 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		EDAE6690AE9518CC7E7A0215 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FA039B176B6568DDD9B77A63 /* TideModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideModels.swift; sourceTree = "<group>"; };
@@ -93,6 +95,7 @@
 		BDDE950AC30C6FA45EB64D8D /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */,
 				4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */,
 			);
 			path = Services;
@@ -162,6 +165,7 @@
 				DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */,
 				17E9C8DD1F965D0BDFEFDF14 /* StrandApp.swift in Sources */,
 				A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */,
+				B62362ECC5E270434E48CAF2 /* TideCache.swift in Sources */,
 				9710D1C6517102085CDA3038 /* TideModels.swift in Sources */,
 				D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */,
 				94362AF0DA705C14FA45AD44 /* TideViewModel.swift in Sources */,

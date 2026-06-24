@@ -47,8 +47,8 @@ enum TideType: String, CaseIterable {
     }
 }
 
-struct TideEvent: Identifiable, Equatable {
-    let id = UUID()
+struct TideEvent: Identifiable, Equatable, Codable {
+    let id: UUID
     let originalTime: Date
     let adjustedTime: Date
     let height: Double
@@ -57,15 +57,30 @@ struct TideEvent: Identifiable, Equatable {
 
     var isBeachWalkPossible: Bool = false
 
+    init(originalTime: Date, adjustedTime: Date, height: Double, type: TideType, date: Date) {
+        self.id = UUID()
+        self.originalTime = originalTime
+        self.adjustedTime = adjustedTime
+        self.height = height
+        self.type = type
+        self.date = date
+    }
+
     var heightFormatted: String {
         String(format: "%.2f m", height)
     }
 }
 
-struct TideDay: Identifiable, Equatable {
-    let id = UUID()
+struct TideDay: Identifiable, Equatable, Codable {
+    let id: UUID
     let date: Date
     var events: [TideEvent]
+
+    init(date: Date, events: [TideEvent]) {
+        self.id = UUID()
+        self.date = date
+        self.events = events
+    }
 
     var hasBeachWalkOpportunity: Bool {
         events.contains { $0.isBeachWalkPossible }

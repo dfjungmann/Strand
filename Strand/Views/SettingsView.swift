@@ -22,21 +22,19 @@ struct SettingsView: View {
 
     private var vorhersageSection: some View {
         Section {
-            Picker("Tage im Voraus", selection: Binding(
-                get: { viewModel.selectedDays },
-                set: { newValue in
-                    viewModel.selectedDays = newValue
-                    Task { await viewModel.reload() }
-                }
+            LabeledContent("Tabelle", value: "Immer 7 Tage")
+            Picker("Standard Diagramm", selection: Binding(
+                get: { viewModel.chartDays },
+                set: { viewModel.chartDays = $0 }
             )) {
-                ForEach(TideViewModel.availableDays, id: \.self) { days in
-                    Text("\(days) Tage").tag(days)
+                ForEach(TideViewModel.chartDayOptions, id: \.self) { n in
+                    Text(n == 1 ? "1 Tag" : "\(n) Tage").tag(n)
                 }
             }
         } header: {
             Text("Vorhersage")
         } footer: {
-            Text("Wie viele Tage ab heute werden geladen.")
+            Text("Tabelle zeigt immer 7 Tage. Standard-Zeitraum für das Diagramm beim Start.")
         }
     }
 
@@ -125,13 +123,26 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                 }
             }
+            LabeledContent("Gecachte Tage") {
+                Text("\(viewModel.cachedDayCount)")
+                    .foregroundStyle(.secondary)
+            }
 
             Button {
                 Task { await viewModel.reload() }
             } label: {
                 HStack {
                     Image(systemName: "arrow.clockwise")
-                    Text("Daten neu laden")
+                    Text("Fehlende Tage nachladen")
+                }
+            }
+
+            Button(role: .destructive) {
+                Task { await viewModel.clearCache() }
+            } label: {
+                HStack {
+                    Image(systemName: "trash")
+                    Text("Cache leeren und neu laden")
                 }
             }
         }

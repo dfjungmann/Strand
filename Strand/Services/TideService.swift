@@ -6,7 +6,6 @@ actor TideService {
     private let stationID = "56"  // Puerto de la Luz, Gran Canaria
     private let baseURL = "https://ideihm.covam.es/api-ihm/getmarea"
 
-    // Canary Islands timezone (UTC+1 in summer, UTC+0 in winter)
     static let canaryIslandsTimeZone = TimeZone(identifier: "Atlantic/Canary")!
 
     private let session: URLSession = {
@@ -16,48 +15,78 @@ actor TideService {
         return URLSession(configuration: config)
     }()
 
-    func fetchTides(for date: Date, timeOffsetMinutes: Int) async throws -> TideDay {
-        let dateString = formatDate(date)
+    // MARK: - Public API
+
+    /// Fetches tide data for `days` days starting from today.
+    /// Uses cache for already-loaded days; only fetches missing ones from the network.
+    func fetchTides(forDays days: Int, timeOffsetMinutes: Int) async throws -> [TideDay] {
+        let today = Calendar.current.startOfDay(for: Date())
+
+        // Determine which dates are missing from cache
+        let allDates = (0..<days).map { offset in
+            Calendar.current.date(byAdding: .day, value: offset, to: today)!
+        }
+
+        let cachedDays = await loadFromCache(dates: allDates, timeOffsetMinutes: timeOffsetMinutes)
+        let cachedDateKeys = Set(cachedDays.map { TideCache.dateKey($0.date) })
+        let missingDates = allDates.filter { !cachedDateKeys.contains(TideCache.dateKey($0)) }
+
+        // Fetch missing days in parallel
+        var fetchedDays: [TideDay] = []
+        if !missingDates.isEmpty {
+            fetchedDays = try await fetchFromNetwork(dates: missingDates, timeOffsetMinutes: timeOffsetMinutes)
+        }
+
+        // Merge and sort
+        let allDays = (cachedDays + fetchedDays).sorted { $0.date < $1.date }
+        return allDays
+    }
+
+    // MARK: - Network
+
+    private func fetchFromNetwork(dates: [Date], timeOffsetMinutes: Int) async throws -> [TideDay] {
+        try await withThrowingTaskGroup(of: TideDay.self) { group in
+            for date in dates {
+                group.addTask {
+                    let response = try await self.fetchRawResponse(for: date)
+                    await TideCache.shared.save(response, for: date)
+                    return self.parseDay(from: response.mareas, referenceDate: date, timeOffsetMinutes: timeOffsetMinutes)
+                }
+            }
+            var results: [TideDay] = []
+            for try await day in group { results.append(day) }
+            return results
+        }
+    }
+
+    private func fetchRawResponse(for date: Date) async throws -> IHMResponse {
         var components = URLComponents(string: baseURL)!
         components.queryItems = [
             URLQueryItem(name: "request", value: "gettide"),
             URLQueryItem(name: "id", value: stationID),
             URLQueryItem(name: "format", value: "json"),
-            URLQueryItem(name: "date", value: dateString)
+            URLQueryItem(name: "date", value: TideCache.dateKey(date))
         ]
-
-        guard let url = components.url else {
-            throw TideServiceError.invalidURL
-        }
+        guard let url = components.url else { throw TideServiceError.invalidURL }
 
         let (data, response) = try await session.data(from: url)
-
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
+        guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
             throw TideServiceError.invalidResponse
         }
-
-        let ihmResponse = try JSONDecoder().decode(IHMResponse.self, from: data)
-        return parseDay(from: ihmResponse.mareas, referenceDate: date, timeOffsetMinutes: timeOffsetMinutes)
+        return try JSONDecoder().decode(IHMResponse.self, from: data)
     }
 
-    func fetchTides(forDays days: Int, timeOffsetMinutes: Int) async throws -> [TideDay] {
-        let today = Calendar.current.startOfDay(for: Date())
-        return try await withThrowingTaskGroup(of: (Int, TideDay).self) { group in
-            for offset in 0..<days {
-                let targetDate = Calendar.current.date(byAdding: .day, value: offset, to: today)!
-                let index = offset
-                group.addTask {
-                    let day = try await self.fetchTides(for: targetDate, timeOffsetMinutes: timeOffsetMinutes)
-                    return (index, day)
-                }
-            }
+    // MARK: - Cache
 
-            var results: [(Int, TideDay)] = []
-            for try await result in group {
-                results.append(result)
+    private func loadFromCache(dates: [Date], timeOffsetMinutes: Int) async -> [TideDay] {
+        var days: [TideDay] = []
+        for date in dates {
+            if let response = await TideCache.shared.load(for: date) {
+                let day = parseDay(from: response.mareas, referenceDate: date, timeOffsetMinutes: timeOffsetMinutes)
+                days.append(day)
             }
-            return results.sorted { $0.0 < $1.0 }.map { $0.1 }
         }
+        return days
     }
 
     // MARK: - Parsing
@@ -69,13 +98,11 @@ actor TideService {
         let events: [TideEvent] = mareas.datos.marea.compactMap { marea in
             guard let tideType = TideType(rawValue: marea.tipo),
                   let height = Double(marea.altura),
-                  let originalTime = parseTime(marea.hora, referenceDate: referenceDate, calendar: cal) else {
-                return nil
-            }
+                  let originalTime = parseTime(marea.hora, referenceDate: referenceDate, calendar: cal)
+            else { return nil }
+
             let adjustedTime = Calendar.current.date(
-                byAdding: .minute,
-                value: timeOffsetMinutes,
-                to: originalTime
+                byAdding: .minute, value: timeOffsetMinutes, to: originalTime
             ) ?? originalTime
 
             return TideEvent(
@@ -86,26 +113,17 @@ actor TideService {
                 date: referenceDate
             )
         }
-
         return TideDay(date: referenceDate, events: events.sorted { $0.adjustedTime < $1.adjustedTime })
     }
 
     private func parseTime(_ timeString: String, referenceDate: Date, calendar: Calendar) -> Date? {
         let parts = timeString.split(separator: ":").compactMap { Int($0) }
         guard parts.count == 2 else { return nil }
-
         var components = calendar.dateComponents([.year, .month, .day], from: referenceDate)
         components.hour = parts[0]
         components.minute = parts[1]
         components.second = 0
         return calendar.date(from: components)
-    }
-
-    private func formatDate(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyyMMdd"
-        formatter.timeZone = Self.canaryIslandsTimeZone
-        return formatter.string(from: date)
     }
 }
 
@@ -114,13 +132,11 @@ actor TideService {
 enum TideServiceError: LocalizedError {
     case invalidURL
     case invalidResponse
-    case decodingError(String)
 
     var errorDescription: String? {
         switch self {
         case .invalidURL: return "Ungültige URL"
         case .invalidResponse: return "Ungültige Server-Antwort"
-        case .decodingError(let msg): return "Datenfehler: \(msg)"
         }
     }
 }

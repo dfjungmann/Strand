@@ -20,9 +20,6 @@ struct TableView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     refreshButton
                 }
-                ToolbarItem(placement: .navigationBarLeading) {
-                    daysPicker
-                }
             }
         }
     }
@@ -75,23 +72,6 @@ struct TableView: View {
     private var refreshButton: some View {
         Button { Task { await viewModel.reload() } } label: {
             Image(systemName: "arrow.clockwise")
-        }
-    }
-
-    private var daysPicker: some View {
-        Menu {
-            ForEach(TideViewModel.availableDays, id: \.self) { days in
-                Button("\(days) Tage") {
-                    viewModel.selectedDays = days
-                    Task { await viewModel.reload() }
-                }
-            }
-        } label: {
-            HStack(spacing: 4) {
-                Text("\(viewModel.selectedDays) Tage")
-                Image(systemName: "chevron.down").font(.caption)
-            }
-            .font(.subheadline)
         }
     }
 }
