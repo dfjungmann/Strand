@@ -46,8 +46,8 @@ final class TideViewModel {
         let storedOffset = UserDefaults.standard.integer(forKey: "chartStartOffset")
         chartStartOffset = (0...2).contains(storedOffset) ? storedOffset : 0
 
-        let storedOffset = UserDefaults.standard.object(forKey: "timeOffsetMinutes") as? Int
-        timeOffsetMinutes = storedOffset ?? -15
+        let storedTimeOffset = UserDefaults.standard.object(forKey: "timeOffsetMinutes") as? Int
+        timeOffsetMinutes = storedTimeOffset ?? -15
 
         let storedThreshold = UserDefaults.standard.object(forKey: "beachWalkThreshold") as? Double
         beachWalkThreshold = storedThreshold ?? 0.6
