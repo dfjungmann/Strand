@@ -7,7 +7,9 @@ final class TideViewModel {
     // MARK: - Constants
 
     static let totalDays = 10         // always fetch & show 10 days
-    static let chartDayOptions = Array(1...7)
+    static let chartDayOptions: [(days: Int, label: String)] = [
+        (1, "1 Tag"), (2, "2 Tage"), (3, "3 Tage"), (7, "1 Woche")
+    ]
     static let chartStartOptions: [(offset: Int, label: String)] = [
         (0, "Heute"), (1, "Morgen"), (2, "Übermorgen")
     ]

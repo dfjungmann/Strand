@@ -27,8 +27,8 @@ struct SettingsView: View {
                 get: { viewModel.chartDays },
                 set: { viewModel.chartDays = $0 }
             )) {
-                ForEach(TideViewModel.chartDayOptions, id: \.self) { n in
-                    Text(n == 1 ? "1 Tag" : "\(n) Tage").tag(n)
+                ForEach(TideViewModel.chartDayOptions, id: \.days) { option in
+                    Text(option.label).tag(option.days)
                 }
             }
         } header: {

@@ -39,26 +39,25 @@ struct ChartView: View {
     private var daysPicker: some View {
         VStack(alignment: .leading, spacing: 8) {
             // Zeile 1: Anzahl Tage
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 8) {
-                    ForEach(TideViewModel.chartDayOptions, id: \.self) { n in
-                        let isSelected = viewModel.chartDays == n
-                        Button {
-                            viewModel.chartDays = n
-                        } label: {
-                            Text(n == 1 ? "1 Tag" : "\(n) Tage")
-                                .font(.subheadline)
-                                .fontWeight(isSelected ? .semibold : .regular)
-                                .padding(.horizontal, 16)
-                                .padding(.vertical, 8)
-                                .background(isSelected ? Color.blue : Color(.systemGray6))
-                                .foregroundStyle(isSelected ? .white : .primary)
-                                .clipShape(Capsule())
-                        }
+            HStack(spacing: 8) {
+                ForEach(TideViewModel.chartDayOptions, id: \.days) { option in
+                    let isSelected = viewModel.chartDays == option.days
+                    Button {
+                        viewModel.chartDays = option.days
+                    } label: {
+                        Text(option.label)
+                            .font(.subheadline)
+                            .fontWeight(isSelected ? .semibold : .regular)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .background(isSelected ? Color.blue : Color(.systemGray6))
+                            .foregroundStyle(isSelected ? .white : .primary)
+                            .clipShape(Capsule())
                     }
                 }
-                .padding(.horizontal, 4)
+                Spacer()
             }
+            .padding(.horizontal, 4)
 
             // Zeile 2: Starttag
             HStack(spacing: 8) {
