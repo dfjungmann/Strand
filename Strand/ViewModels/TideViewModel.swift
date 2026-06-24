@@ -42,6 +42,7 @@ final class TideViewModel {
 
     var tideDays: [TideDay] = []
     var weatherDays: [WeatherDay] = []
+    var hourlyTemps: [HourlyTemp] = []
     var isLoading = false
     var errorMessage: String?
     var lastUpdated: Date?
@@ -90,7 +91,10 @@ final class TideViewModel {
             errorMessage = error.localizedDescription
         }
         // Weather failures are non-fatal
-        weatherDays = (try? await weatherFetch) ?? []
+        if let wx = try? await weatherFetch {
+            weatherDays = wx.days
+            hourlyTemps = wx.hourly
+        }
         lastUpdated = Date()
         isLoading = false
     }
@@ -99,6 +103,7 @@ final class TideViewModel {
     func reload() async {
         tideDays = []
         weatherDays = []
+        hourlyTemps = []
         await loadTides()
     }
 
@@ -137,6 +142,12 @@ final class TideViewModel {
     var beachWalkThreshold: Double { beachWalkThresholdSafe }
 
     // MARK: - Weather Lookup
+
+    /// Returns hourly temps for a window of `dayCount` days starting at `startDate`
+    func hourlyTemps(from startDate: Date, dayCount: Int) -> [HourlyTemp] {
+        let end = Calendar.current.date(byAdding: .day, value: dayCount, to: startDate)!
+        return hourlyTemps.filter { $0.time >= startDate && $0.time < end }
+    }
 
     func weather(for date: Date) -> WeatherDay? {
         let canary = TideService.canaryIslandsTimeZone

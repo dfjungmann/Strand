@@ -19,12 +19,14 @@
 		B62362ECC5E270434E48CAF2 /* TideCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */; };
 		D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */; };
 		DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA028AEAC3247188CB0EB539 /* SettingsView.swift */; };
+		ED52E826DD5B362809C40075 /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241225197FA8E158FACB743A /* DayDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		098356A9AD4ECC4271276BAD /* StrandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrandApp.swift; sourceTree = "<group>"; };
 		18FB5ACC469E5D5636D23FC8 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		1F455BDF21623385D050052D /* Strand.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		241225197FA8E158FACB743A /* DayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailView.swift; sourceTree = "<group>"; };
 		2C3D129F1B94B3AA82CA0916 /* AstronomyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstronomyService.swift; sourceTree = "<group>"; };
 		428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeachWalkView.swift; sourceTree = "<group>"; };
 		43493A1B112812438249B6F3 /* TideViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideViewModel.swift; sourceTree = "<group>"; };
@@ -52,6 +54,7 @@
 			children = (
 				428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */,
 				18FB5ACC469E5D5636D23FC8 /* ChartView.swift */,
+				241225197FA8E158FACB743A /* DayDetailView.swift */,
 				EA028AEAC3247188CB0EB539 /* SettingsView.swift */,
 				8E08E74456BF3AC82D99827E /* TableView.swift */,
 			);
@@ -169,6 +172,7 @@
 				070CDFD1F7AC04313C762B03 /* BeachWalkView.swift in Sources */,
 				5B898008E639EC3E8A4EEE38 /* ChartView.swift in Sources */,
 				1B1399EDF0D0A6181C31CD30 /* ContentView.swift in Sources */,
+				ED52E826DD5B362809C40075 /* DayDetailView.swift in Sources */,
 				DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */,
 				17E9C8DD1F965D0BDFEFDF14 /* StrandApp.swift in Sources */,
 				A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */,

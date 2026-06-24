@@ -20,10 +20,19 @@ struct WeatherDay: Identifiable {
     }
 }
 
+// MARK: - Hourly Temp Model
+
+struct HourlyTemp: Identifiable {
+    let id = UUID()
+    let time: Date
+    let temp: Double   // °C
+}
+
 // MARK: - Open-Meteo Response
 
 private struct OpenMeteoResponse: Codable {
     let daily: OpenMeteoDailyData
+    let hourly: OpenMeteoHourlyData
 }
 
 private struct OpenMeteoDailyData: Codable {
@@ -41,6 +50,16 @@ private struct OpenMeteoDailyData: Codable {
         case precipitationProbabilityMax  = "precipitation_probability_max"
         case sunshineDuration             = "sunshine_duration"
         case cloudCoverMean               = "cloud_cover_mean"
+    }
+}
+
+private struct OpenMeteoHourlyData: Codable {
+    let time: [String]
+    let temperature2m: [Double?]
+
+    enum CodingKeys: String, CodingKey {
+        case time
+        case temperature2m = "temperature_2m"
     }
 }
 
@@ -62,12 +81,13 @@ actor WeatherService {
         return URLSession(configuration: cfg)
     }()
 
-    func fetchWeather(days: Int) async throws -> [WeatherDay] {
+    func fetchWeather(days: Int) async throws -> (days: [WeatherDay], hourly: [HourlyTemp]) {
         var comps = URLComponents(string: baseURL)!
         comps.queryItems = [
             URLQueryItem(name: "latitude",    value: String(latitude)),
             URLQueryItem(name: "longitude",   value: String(longitude)),
             URLQueryItem(name: "daily",       value: "temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunshine_duration,cloud_cover_mean"),
+            URLQueryItem(name: "hourly",      value: "temperature_2m"),
             URLQueryItem(name: "timezone",    value: "Atlantic/Canary"),
             URLQueryItem(name: "forecast_days", value: String(days))
         ]
@@ -79,10 +99,10 @@ actor WeatherService {
         }
 
         let decoded = try JSONDecoder().decode(OpenMeteoResponse.self, from: data)
-        return parse(decoded.daily)
+        return (parseDaily(decoded.daily), parseHourly(decoded.hourly))
     }
 
-    private func parse(_ daily: OpenMeteoDailyData) -> [WeatherDay] {
+    private func parseDaily(_ daily: OpenMeteoDailyData) -> [WeatherDay] {
         let canary = TimeZone(identifier: "Atlantic/Canary")!
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = canary
@@ -104,6 +124,20 @@ actor WeatherService {
         }
     }
 }
+
+    private func parseHourly(_ hourly: OpenMeteoHourlyData) -> [HourlyTemp] {
+        let canary = TimeZone(identifier: "Atlantic/Canary")!
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
+        formatter.timeZone = canary
+
+        return hourly.time.enumerated().compactMap { idx, timeStr in
+            guard let date = formatter.date(from: timeStr),
+                  let temp = hourly.temperature2m[safe: idx].flatMap({ $0 })
+            else { return nil }
+            return HourlyTemp(time: date, temp: temp)
+        }
+    }
 
 // MARK: - Errors
 

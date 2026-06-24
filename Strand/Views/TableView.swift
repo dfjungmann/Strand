@@ -16,6 +16,9 @@ struct TableView: View {
             }
             .navigationTitle("Gezeiten")
             .navigationBarTitleDisplayMode(.large)
+            .sheet(item: $selectedDay) { day in
+                DayDetailView(day: day, viewModel: viewModel)
+            }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     refreshButton
@@ -26,11 +29,15 @@ struct TableView: View {
 
     // MARK: - List
 
+    @State private var selectedDay: TideDay?
+
     private var tideList: some View {
         List {
             ForEach(viewModel.tideDays) { day in
                 CompactDayRow(day: day, viewModel: viewModel)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                    .contentShape(Rectangle())
+                    .onTapGesture { selectedDay = day }
             }
 
             Section {
