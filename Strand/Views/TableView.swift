@@ -82,6 +82,10 @@ struct CompactDayRow: View {
     let day: TideDay
     let viewModel: TideViewModel
 
+    private var astronomy: AstronomyData {
+        AstronomyService.data(for: day.date)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
 
@@ -131,6 +135,33 @@ struct CompactDayRow: View {
                     .clipShape(RoundedRectangle(cornerRadius: 7))
                 }
             }
+
+            // ── Sonne & Mond ──
+            HStack(spacing: 16) {
+                if let rise = astronomy.sunrise {
+                    HStack(spacing: 4) {
+                        Image(systemName: "sunrise.fill")
+                            .foregroundStyle(.yellow)
+                        Text(viewModel.formatTime(rise))
+                            .monospacedDigit()
+                    }
+                }
+                if let set = astronomy.sunset {
+                    HStack(spacing: 4) {
+                        Image(systemName: "sunset.fill")
+                            .foregroundStyle(.orange)
+                        Text(viewModel.formatTime(set))
+                            .monospacedDigit()
+                    }
+                }
+                Spacer()
+                HStack(spacing: 4) {
+                    Text(astronomy.moonPhase.emoji)
+                    Text(astronomy.moonPhase.rawValue)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .font(.caption)
 
             Divider()
                 .padding(.top, 2)
