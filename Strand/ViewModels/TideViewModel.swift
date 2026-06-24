@@ -25,8 +25,17 @@ final class TideViewModel {
     var timeOffsetMinutes: Int {
         didSet { UserDefaults.standard.set(timeOffsetMinutes, forKey: "timeOffsetMinutes") }
     }
-    var beachWalkThreshold: Double {
-        didSet { UserDefaults.standard.set(beachWalkThreshold, forKey: "beachWalkThreshold") }
+    /// Sichere Grenze – Markierung grün
+    var beachWalkThresholdSafe: Double {
+        didSet { UserDefaults.standard.set(beachWalkThresholdSafe, forKey: "beachWalkThresholdSafe") }
+    }
+    /// Wahrscheinliche Grenze – Markierung gelb (muss >= safe sein)
+    var beachWalkThresholdLikely: Double {
+        didSet { UserDefaults.standard.set(beachWalkThresholdLikely, forKey: "beachWalkThresholdLikely") }
+    }
+    /// Schriftgröße für Zeiten/Höhen in der Tabelle
+    var tableFontSize: Double {
+        didSet { UserDefaults.standard.set(tableFontSize, forKey: "tableFontSize") }
     }
 
     // MARK: - State
@@ -49,8 +58,14 @@ final class TideViewModel {
         let storedTimeOffset = UserDefaults.standard.object(forKey: "timeOffsetMinutes") as? Int
         timeOffsetMinutes = storedTimeOffset ?? -15
 
-        let storedThreshold = UserDefaults.standard.object(forKey: "beachWalkThreshold") as? Double
-        beachWalkThreshold = storedThreshold ?? 0.6
+        let storedSafe = UserDefaults.standard.object(forKey: "beachWalkThresholdSafe") as? Double
+        beachWalkThresholdSafe = storedSafe ?? 0.6
+
+        let storedLikely = UserDefaults.standard.object(forKey: "beachWalkThresholdLikely") as? Double
+        beachWalkThresholdLikely = storedLikely ?? 0.9
+
+        let storedFont = UserDefaults.standard.object(forKey: "tableFontSize") as? Double
+        tableFontSize = storedFont ?? 14.0
     }
 
     // MARK: - Data Loading
@@ -94,12 +109,25 @@ final class TideViewModel {
             var updated = day
             updated.events = day.events.map { event in
                 var e = event
-                e.isBeachWalkPossible = (event.type == .lowTide && event.height <= beachWalkThreshold)
+                guard event.type == .lowTide else {
+                    e.beachWalkStatus = .none
+                    return e
+                }
+                if event.height <= beachWalkThresholdSafe {
+                    e.beachWalkStatus = .safe
+                } else if event.height <= beachWalkThresholdLikely {
+                    e.beachWalkStatus = .likely
+                } else {
+                    e.beachWalkStatus = .none
+                }
                 return e
             }
             return updated
         }
     }
+
+    /// Convenience: old single threshold, kept for BeachWalkView gauge
+    var beachWalkThreshold: Double { beachWalkThresholdSafe }
 
     // MARK: - Chart Data
 

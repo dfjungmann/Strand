@@ -109,29 +109,38 @@ struct CompactDayRow: View {
                 }
             }
 
-            // ── Spalten: Zeit + Höhe übereinander, bei Strandgang farbig ──
+            // ── Spalten: Zeit + Höhe übereinander, Strandgang farbig ──
+            let fontSize = viewModel.tableFontSize
             HStack(spacing: 4) {
                 ForEach(day.events) { event in
-                    let isBeach = event.isBeachWalkPossible
                     let tideColor: Color = event.type == .highTide ? .blue : .orange
+                    let bgColor: Color = {
+                        switch event.beachWalkStatus {
+                        case .safe:   return .green
+                        case .likely: return .yellow
+                        case .none:   return .clear
+                        }
+                    }()
+                    let onBg = event.beachWalkStatus != .none
+                    let textOnBg: Color = event.beachWalkStatus == .likely ? .black : .white
 
                     VStack(spacing: 2) {
                         HStack(spacing: 3) {
                             Image(systemName: event.type == .highTide ? "arrow.up" : "arrow.down")
-                                .font(.system(size: 9, weight: .bold))
-                                .foregroundStyle(isBeach ? .white : tideColor)
+                                .font(.system(size: fontSize * 0.65, weight: .bold))
+                                .foregroundStyle(onBg ? textOnBg : tideColor)
                             Text(viewModel.formatTime(event.adjustedTime))
-                                .font(.system(size: 13, weight: .medium).monospacedDigit())
-                                .foregroundStyle(isBeach ? .white : .primary)
+                                .font(.system(size: fontSize, weight: .medium).monospacedDigit())
+                                .foregroundStyle(onBg ? textOnBg : .primary)
                         }
                         Text(event.heightFormatted)
-                            .font(.system(size: 12).monospacedDigit())
-                            .foregroundStyle(isBeach ? .white : tideColor)
+                            .font(.system(size: fontSize * 0.9).monospacedDigit())
+                            .foregroundStyle(onBg ? textOnBg : tideColor)
                     }
                     .padding(.horizontal, 4)
                     .padding(.vertical, 4)
                     .frame(maxWidth: .infinity)
-                    .background(isBeach ? Color.green : Color.clear)
+                    .background(bgColor)
                     .clipShape(RoundedRectangle(cornerRadius: 7))
                 }
             }

@@ -7,9 +7,10 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                vorhersageSection
-                zeitkorrekturSection
-                strandgangSection
+            vorhersageSection
+            zeitkorrekturSection
+            schriftSection
+            strandgangSection
                 datenquelleSection
                 kiSection
             }
@@ -72,41 +73,93 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Tabelle Schrift
+
+    private var schriftSection: some View {
+        Section {
+            HStack {
+                Text("Schriftgröße")
+                Spacer()
+                Text(String(format: "%.0f pt", viewModel.tableFontSize))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            Slider(
+                value: Binding(
+                    get: { viewModel.tableFontSize },
+                    set: { viewModel.tableFontSize = $0 }
+                ),
+                in: 10...20, step: 1
+            ) {
+                Text("Schrift")
+            } minimumValueLabel: {
+                Text("10").font(.caption)
+            } maximumValueLabel: {
+                Text("20").font(.caption)
+            }
+            Button("Standard (14 pt)") { viewModel.tableFontSize = 14 }
+                .foregroundStyle(.blue)
+        } header: {
+            Text("Tabelle – Schriftgröße")
+        } footer: {
+            Text("Schriftgröße der Zeiten und Höhen in der Gezeitentabelle.")
+        }
+    }
+
     // MARK: - Strandgang
 
     private var strandgangSection: some View {
         Section {
+            // Sicher (grün)
             HStack {
-                Text("Grenzwert Niedrigwasser")
+                Circle().fill(.green).frame(width: 10, height: 10)
+                Text("Sicher")
                 Spacer()
-                Text(String(format: "%.2f m", viewModel.beachWalkThreshold))
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
+                Text(String(format: "%.2f m", viewModel.beachWalkThresholdSafe))
+                    .foregroundStyle(.secondary).monospacedDigit()
             }
-
             Slider(
                 value: Binding(
-                    get: { viewModel.beachWalkThreshold },
-                    set: { viewModel.beachWalkThreshold = $0 }
+                    get: { viewModel.beachWalkThresholdSafe },
+                    set: {
+                        viewModel.beachWalkThresholdSafe = $0
+                        if viewModel.beachWalkThresholdLikely < $0 {
+                            viewModel.beachWalkThresholdLikely = $0
+                        }
+                    }
                 ),
-                in: 0.1...1.5,
-                step: 0.05
-            ) {
-                Text("Grenzwert")
-            } minimumValueLabel: {
-                Text("0.1 m").font(.caption)
-            } maximumValueLabel: {
-                Text("1.5 m").font(.caption)
-            }
+                in: 0.1...1.5, step: 0.05
+            ) {} minimumValueLabel: { Text("0.1").font(.caption) }
+               maximumValueLabel: { Text("1.5").font(.caption) }
 
-            Button("Auf Standard zurücksetzen (0.60 m)") {
-                viewModel.beachWalkThreshold = 0.6
+            // Wahrscheinlich (gelb)
+            HStack {
+                Circle().fill(.yellow).frame(width: 10, height: 10)
+                Text("Wahrscheinlich")
+                Spacer()
+                Text(String(format: "%.2f m", viewModel.beachWalkThresholdLikely))
+                    .foregroundStyle(.secondary).monospacedDigit()
+            }
+            Slider(
+                value: Binding(
+                    get: { viewModel.beachWalkThresholdLikely },
+                    set: {
+                        viewModel.beachWalkThresholdLikely = max($0, viewModel.beachWalkThresholdSafe)
+                    }
+                ),
+                in: 0.1...1.5, step: 0.05
+            ) {} minimumValueLabel: { Text("0.1").font(.caption) }
+               maximumValueLabel: { Text("1.5").font(.caption) }
+
+            Button("Standard zurücksetzen (0.60 / 0.90 m)") {
+                viewModel.beachWalkThresholdSafe   = 0.6
+                viewModel.beachWalkThresholdLikely = 0.9
             }
             .foregroundStyle(.blue)
         } header: {
             Text("Strandspaziergang")
         } footer: {
-            Text("Strandgang möglich wenn das Niedrigwasser diese Höhe unterschreitet. Vor Ort kalibrierbar.")
+            Text("🟢 Sicher: Niedrigwasser unter diesem Wert = grün.\n🟡 Wahrscheinlich: zwischen Sicher und diesem Wert = gelb.\nVor Ort kalibrierbar.")
         }
     }
 

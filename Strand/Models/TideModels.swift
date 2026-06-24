@@ -26,6 +26,22 @@ struct IHMMarea: Codable {
     let tipo: String
 }
 
+// MARK: - Beach Walk Status
+
+enum BeachWalkStatus: String, Codable, Equatable {
+    case none    /// above both thresholds
+    case likely  /// below likelyThreshold, above safeThreshold → yellow
+    case safe    /// below safeThreshold → green
+
+    var color: String {
+        switch self {
+        case .none:   return "clear"
+        case .likely: return "yellow"
+        case .safe:   return "green"
+        }
+    }
+}
+
 // MARK: - App Domain Models
 
 enum TideType: String, CaseIterable, Codable {
@@ -55,7 +71,9 @@ struct TideEvent: Identifiable, Equatable, Codable {
     let type: TideType
     let date: Date
 
-    var isBeachWalkPossible: Bool = false
+    var beachWalkStatus: BeachWalkStatus = .none
+
+    var isBeachWalkPossible: Bool { beachWalkStatus != .none }
 
     init(originalTime: Date, adjustedTime: Date, height: Double, type: TideType, date: Date) {
         self.id = UUID()
