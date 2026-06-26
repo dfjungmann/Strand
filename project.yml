@@ -36,10 +36,21 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: false
+          NSAllowsArbitraryLoadsInWebContent: true
           NSExceptionDomains:
             ideihm.covam.es:
               NSExceptionAllowsInsecureHTTPLoads: false
               NSIncludesSubdomains: true
+            api.rainviewer.com:
+              NSExceptionAllowsInsecureHTTPLoads: false
+              NSIncludesSubdomains: false
+            tilecache.rainviewer.com:
+              NSExceptionAllowsInsecureHTTPLoads: false
+              NSIncludesSubdomains: false
+            tile.openweathermap.org:
+              NSExceptionAllowsInsecureHTTPLoads: false
+              NSIncludesSubdomains: false
     settings:
       base:
         INFOPLIST_FILE: Strand/Info.plist
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon

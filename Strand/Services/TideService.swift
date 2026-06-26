@@ -119,10 +119,15 @@ actor TideService {
     nonisolated private static func parseTime(_ timeString: String, referenceDate: Date, calendar: Calendar) -> Date? {
         let parts = timeString.split(separator: ":").compactMap { Int($0) }
         guard parts.count == 2 else { return nil }
+        // IHM publishes tide times in UTC (standard for maritime data).
+        // We take the calendar date (year/month/day) in Canary time – matching
+        // the date we queried – but override the time zone to UTC so the
+        // hours/minutes are correctly interpreted as UTC, not as local time.
         var components = calendar.dateComponents([.year, .month, .day], from: referenceDate)
-        components.hour = parts[0]
+        components.hour   = parts[0]
         components.minute = parts[1]
         components.second = 0
+        components.timeZone = TimeZone(identifier: "UTC")
         return calendar.date(from: components)
     }
 }

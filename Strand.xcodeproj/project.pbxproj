@@ -9,30 +9,42 @@
 /* Begin PBXBuildFile section */
 		070CDFD1F7AC04313C762B03 /* BeachWalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */; };
 		17E9C8DD1F965D0BDFEFDF14 /* StrandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098356A9AD4ECC4271276BAD /* StrandApp.swift */; };
+		1B0156442CBA2564175E7698 /* TideClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160E702BD8AD9974C80F88BA /* TideClockView.swift */; };
 		1B1399EDF0D0A6181C31CD30 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAE6690AE9518CC7E7A0215 /* ContentView.swift */; };
 		2102E1101E1B506A342680B0 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655480A363D527F0B8163CC2 /* WeatherService.swift */; };
 		5B898008E639EC3E8A4EEE38 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FB5ACC469E5D5636D23FC8 /* ChartView.swift */; };
 		7269B07E278D6952FF1A6AEC /* AstronomyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3D129F1B94B3AA82CA0916 /* AstronomyService.swift */; };
 		94362AF0DA705C14FA45AD44 /* TideViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43493A1B112812438249B6F3 /* TideViewModel.swift */; };
 		9710D1C6517102085CDA3038 /* TideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA039B176B6568DDD9B77A63 /* TideModels.swift */; };
+		9985AF055C67228E7520B004 /* WeatherForecastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20112AF67C07ECD8302FDC3E /* WeatherForecastView.swift */; };
 		A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E08E74456BF3AC82D99827E /* TableView.swift */; };
+		AC551121E977632D9351133F /* MarineService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D22D3CFB932B739BBA7EAB5 /* MarineService.swift */; };
+		B1E1080DF01A34F5E6970406 /* WeatherMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53EE2D071A232010E553F17E /* WeatherMapView.swift */; };
 		B62362ECC5E270434E48CAF2 /* TideCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */; };
+		C1081940DAA6A42C8ECB7135 /* VerlaufView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA96211DF067468998AF8E3A /* VerlaufView.swift */; };
 		D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */; };
 		DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA028AEAC3247188CB0EB539 /* SettingsView.swift */; };
+		E97F4B7A448AFD13A89997F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5EEBC1F2F904F87B154A7036 /* Assets.xcassets */; };
 		ED52E826DD5B362809C40075 /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241225197FA8E158FACB743A /* DayDetailView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		098356A9AD4ECC4271276BAD /* StrandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrandApp.swift; sourceTree = "<group>"; };
+		160E702BD8AD9974C80F88BA /* TideClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideClockView.swift; sourceTree = "<group>"; };
 		18FB5ACC469E5D5636D23FC8 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
-		1F455BDF21623385D050052D /* Strand.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F455BDF21623385D050052D /* Strand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		20112AF67C07ECD8302FDC3E /* WeatherForecastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherForecastView.swift; sourceTree = "<group>"; };
 		241225197FA8E158FACB743A /* DayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailView.swift; sourceTree = "<group>"; };
 		2C3D129F1B94B3AA82CA0916 /* AstronomyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstronomyService.swift; sourceTree = "<group>"; };
+		3D22D3CFB932B739BBA7EAB5 /* MarineService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarineService.swift; sourceTree = "<group>"; };
 		428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeachWalkView.swift; sourceTree = "<group>"; };
 		43493A1B112812438249B6F3 /* TideViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideViewModel.swift; sourceTree = "<group>"; };
 		4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideService.swift; sourceTree = "<group>"; };
+		53EE2D071A232010E553F17E /* WeatherMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherMapView.swift; sourceTree = "<group>"; };
+		5EEBC1F2F904F87B154A7036 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		655480A363D527F0B8163CC2 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		8E08E74456BF3AC82D99827E /* TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
+		BA96211DF067468998AF8E3A /* VerlaufView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerlaufView.swift; sourceTree = "<group>"; };
 		DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideCache.swift; sourceTree = "<group>"; };
 		EA028AEAC3247188CB0EB539 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		EDAE6690AE9518CC7E7A0215 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -57,6 +69,10 @@
 				241225197FA8E158FACB743A /* DayDetailView.swift */,
 				EA028AEAC3247188CB0EB539 /* SettingsView.swift */,
 				8E08E74456BF3AC82D99827E /* TableView.swift */,
+				160E702BD8AD9974C80F88BA /* TideClockView.swift */,
+				BA96211DF067468998AF8E3A /* VerlaufView.swift */,
+				20112AF67C07ECD8302FDC3E /* WeatherForecastView.swift */,
+				53EE2D071A232010E553F17E /* WeatherMapView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -72,6 +88,7 @@
 		4C3F8EB3C8A0C8E14C9B5131 /* Strand */ = {
 			isa = PBXGroup;
 			children = (
+				5EEBC1F2F904F87B154A7036 /* Assets.xcassets */,
 				EDAE6690AE9518CC7E7A0215 /* ContentView.swift */,
 				FA55C59034089AD3E6C16D63 /* Info.plist */,
 				098356A9AD4ECC4271276BAD /* StrandApp.swift */,
@@ -103,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				2C3D129F1B94B3AA82CA0916 /* AstronomyService.swift */,
+				3D22D3CFB932B739BBA7EAB5 /* MarineService.swift */,
 				DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */,
 				4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */,
 				655480A363D527F0B8163CC2 /* WeatherService.swift */,
@@ -118,6 +136,7 @@
 			buildConfigurationList = 954E11B078688E7AAE145D61 /* Build configuration list for PBXNativeTarget "Strand" */;
 			buildPhases = (
 				3CD6E2216EB5830EBE7D63C9 /* Sources */,
+				B10341BF661CB86C517F7CC9 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -163,6 +182,17 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		B10341BF661CB86C517F7CC9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E97F4B7A448AFD13A89997F3 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		3CD6E2216EB5830EBE7D63C9 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -173,13 +203,18 @@
 				5B898008E639EC3E8A4EEE38 /* ChartView.swift in Sources */,
 				1B1399EDF0D0A6181C31CD30 /* ContentView.swift in Sources */,
 				ED52E826DD5B362809C40075 /* DayDetailView.swift in Sources */,
+				AC551121E977632D9351133F /* MarineService.swift in Sources */,
 				DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */,
 				17E9C8DD1F965D0BDFEFDF14 /* StrandApp.swift in Sources */,
 				A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */,
 				B62362ECC5E270434E48CAF2 /* TideCache.swift in Sources */,
+				1B0156442CBA2564175E7698 /* TideClockView.swift in Sources */,
 				9710D1C6517102085CDA3038 /* TideModels.swift in Sources */,
 				D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */,
 				94362AF0DA705C14FA45AD44 /* TideViewModel.swift in Sources */,
+				C1081940DAA6A42C8ECB7135 /* VerlaufView.swift in Sources */,
+				9985AF055C67228E7520B004 /* WeatherForecastView.swift in Sources */,
+				B1E1080DF01A34F5E6970406 /* WeatherMapView.swift in Sources */,
 				2102E1101E1B506A342680B0 /* WeatherService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -192,6 +227,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 47D76MD2KB;
 				INFOPLIST_FILE = Strand/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -207,6 +243,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				DEVELOPMENT_TEAM = 47D76MD2KB;
 				INFOPLIST_FILE = Strand/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -20,12 +20,17 @@ struct WeatherDay: Identifiable {
     }
 }
 
-// MARK: - Hourly Temp Model
+// MARK: - Hourly Weather Model
 
-struct HourlyTemp: Identifiable {
+struct HourlyWeather: Identifiable {
     let id = UUID()
     let time: Date
-    let temp: Double   // °C
+    let temp: Double       // °C
+    let humidity: Int      // %
+    let cloudCover: Int    // %
+    let precipProb: Int    // %
+    let windSpeed: Double  // km/h
+    let windDirection: Int // meteorological degrees (0 = from N, 90 = from E, …)
 }
 
 // MARK: - Open-Meteo Response
@@ -56,10 +61,20 @@ private struct OpenMeteoDailyData: Codable {
 private struct OpenMeteoHourlyData: Codable {
     let time: [String]
     let temperature2m: [Double?]
+    let relativeHumidity2m: [Int?]
+    let cloudCover: [Int?]
+    let precipitationProbability: [Int?]
+    let windspeed10m: [Double?]
+    let winddirection10m: [Int?]
 
     enum CodingKeys: String, CodingKey {
         case time
-        case temperature2m = "temperature_2m"
+        case temperature2m            = "temperature_2m"
+        case relativeHumidity2m       = "relative_humidity_2m"
+        case cloudCover               = "cloud_cover"
+        case precipitationProbability = "precipitation_probability"
+        case windspeed10m             = "windspeed_10m"
+        case winddirection10m         = "winddirection_10m"
     }
 }
 
@@ -72,7 +87,7 @@ actor WeatherService {
     // Southern microclimate: consistently sunny, unlike the cloudier north
     private let latitude  = 27.754
     private let longitude = -15.571
-    private let baseURL   = "https://api.open-meteo.com/v1/forecast"
+    private let baseURL   = "https://api.open-meteo.com/v1/forecast"  // Open-Meteo best_match (automatically best model for each location)
 
     private let session: URLSession = {
         let cfg = URLSessionConfiguration.default
@@ -81,13 +96,13 @@ actor WeatherService {
         return URLSession(configuration: cfg)
     }()
 
-    func fetchWeather(days: Int) async throws -> (days: [WeatherDay], hourly: [HourlyTemp]) {
+    func fetchWeather(days: Int) async throws -> (days: [WeatherDay], hourly: [HourlyWeather]) {
         var comps = URLComponents(string: baseURL)!
         comps.queryItems = [
             URLQueryItem(name: "latitude",    value: String(latitude)),
             URLQueryItem(name: "longitude",   value: String(longitude)),
             URLQueryItem(name: "daily",       value: "temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunshine_duration,cloud_cover_mean"),
-            URLQueryItem(name: "hourly",      value: "temperature_2m"),
+            URLQueryItem(name: "hourly",      value: "temperature_2m,relative_humidity_2m,cloud_cover,precipitation_probability,windspeed_10m,winddirection_10m"),
             URLQueryItem(name: "timezone",    value: "Atlantic/Canary"),
             URLQueryItem(name: "forecast_days", value: String(days))
         ]
@@ -125,7 +140,7 @@ actor WeatherService {
     }
 }
 
-    private func parseHourly(_ hourly: OpenMeteoHourlyData) -> [HourlyTemp] {
+    private func parseHourly(_ hourly: OpenMeteoHourlyData) -> [HourlyWeather] {
         let canary = TimeZone(identifier: "Atlantic/Canary")!
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm"
@@ -135,7 +150,14 @@ actor WeatherService {
             guard let date = formatter.date(from: timeStr),
                   let temp = hourly.temperature2m[safe: idx].flatMap({ $0 })
             else { return nil }
-            return HourlyTemp(time: date, temp: temp)
+            let humidity  = hourly.relativeHumidity2m[safe: idx].flatMap({ $0 }) ?? 0
+            let cloud     = hourly.cloudCover[safe: idx].flatMap({ $0 }) ?? 0
+            let precip    = hourly.precipitationProbability[safe: idx].flatMap({ $0 }) ?? 0
+            let wind      = hourly.windspeed10m[safe: idx].flatMap({ $0 }) ?? 0
+            let windDir   = hourly.winddirection10m[safe: idx].flatMap({ $0 }) ?? 0
+            return HourlyWeather(time: date, temp: temp,
+                                 humidity: humidity, cloudCover: cloud, precipProb: precip,
+                                 windSpeed: wind, windDirection: windDir)
         }
     }
 

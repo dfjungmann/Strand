@@ -7,35 +7,16 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-            vorhersageSection
             zeitkorrekturSection
             schriftSection
             strandgangSection
                 datenquelleSection
+                verlaufSection
+                radarSection
                 kiSection
             }
             .navigationTitle("Einstellungen")
             .navigationBarTitleDisplayMode(.large)
-        }
-    }
-
-    // MARK: - Vorhersage
-
-    private var vorhersageSection: some View {
-        Section {
-            LabeledContent("Tabelle", value: "Immer 7 Tage")
-            Picker("Standard Diagramm", selection: Binding(
-                get: { viewModel.chartDays },
-                set: { viewModel.chartDays = $0 }
-            )) {
-                ForEach(TideViewModel.chartDayOptions, id: \.days) { option in
-                    Text(option.label).tag(option.days)
-                }
-            }
-        } header: {
-            Text("Vorhersage")
-        } footer: {
-            Text("Tabelle zeigt immer 7 Tage. Standard-Zeitraum für das Diagramm beim Start.")
         }
     }
 
@@ -73,6 +54,9 @@ struct SettingsView: View {
         }
     }
 
+    @AppStorage("tableFontSize") private var tableFontSize = 14.0
+    @AppStorage("verlauf_default_days") private var verlaufDefaultDays: Int = 5
+
     // MARK: - Tabelle Schrift
 
     private var schriftSection: some View {
@@ -80,24 +64,18 @@ struct SettingsView: View {
             HStack {
                 Text("Schriftgröße")
                 Spacer()
-                Text(String(format: "%.0f pt", viewModel.tableFontSize))
+                Text(String(format: "%.0f pt", tableFontSize))
                     .foregroundStyle(.secondary)
                     .monospacedDigit()
             }
-            Slider(
-                value: Binding(
-                    get: { viewModel.tableFontSize },
-                    set: { viewModel.tableFontSize = $0 }
-                ),
-                in: 10...20, step: 1
-            ) {
+            Slider(value: $tableFontSize, in: 10...25, step: 1) {
                 Text("Schrift")
             } minimumValueLabel: {
                 Text("10").font(.caption)
             } maximumValueLabel: {
-                Text("20").font(.caption)
+                Text("25").font(.caption)
             }
-            Button("Standard (14 pt)") { viewModel.tableFontSize = 14 }
+            Button("Standard (14 pt)") { tableFontSize = 14 }
                 .foregroundStyle(.blue)
         } header: {
             Text("Tabelle – Schriftgröße")
@@ -201,6 +179,56 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Verlauf
+
+    private var verlaufSection: some View {
+        Section {
+            Stepper(value: $verlaufDefaultDays, in: 2...14) {
+                HStack {
+                    Text("Standard-Tage")
+                    Spacer()
+                    Text("\(verlaufDefaultDays) Tage")
+                        .foregroundStyle(.secondary)
+                        .monospacedDigit()
+                }
+            }
+        } header: {
+            Text("Verlauf")
+        } footer: {
+            Text("Anzahl der Tage die beim Öffnen des Verlauf-Tabs angezeigt werden (2–14).")
+        }
+    }
+
+    // MARK: - Radar API Key
+
+    private var radarSection: some View {
+        Section {
+            HStack {
+                Image(systemName: "dot.radiowaves.left.and.right")
+                    .foregroundStyle(.blue)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Wetterradar")
+                        .font(.subheadline)
+                    let key = UserDefaults.standard.string(forKey: "owm_api_key") ?? ""
+                    if key.isEmpty {
+                        Text("API-Key nicht konfiguriert")
+                            .font(.caption).foregroundStyle(.orange)
+                    } else {
+                        Text("API-Key gespeichert ✓")
+                            .font(.caption).foregroundStyle(.green)
+                    }
+                }
+            }
+            NavigationLink("OpenWeatherMap konfigurieren") {
+                OWMSettingsView()
+            }
+        } header: {
+            Text("Radar")
+        } footer: {
+            Text("Kostenloser API-Key von openweathermap.org für schnelle native Radar-Kacheln.")
+        }
+    }
+
     // MARK: - KI
 
     private var kiSection: some View {
@@ -223,6 +251,111 @@ struct SettingsView: View {
             Text("Künstliche Intelligenz")
         } footer: {
             Text("OpenAI API-Schlüssel für KI-gestützte Strandprognosen. Zugangsdaten werden sicher im Keychain gespeichert.")
+        }
+    }
+}
+
+// MARK: - OWM Settings
+
+struct OWMSettingsView: View {
+    @AppStorage("owm_api_key") private var apiKey = ""
+    @State private var tempKey = ""
+    @State private var showKey = true          // visible by default so user can verify
+    @State private var testStatus: TestStatus = .idle
+
+    enum TestStatus {
+        case idle, testing
+        case ok(Int)     // HTTP 200
+        case fail(Int)   // other HTTP code
+        case error(String)
+
+        var label: String {
+            switch self {
+            case .idle:        return ""
+            case .testing:     return "Teste…"
+            case .ok:          return "✅ Map-Tiles funktionieren"
+            case .fail(let c): return "❌ HTTP \(c) – Key hat keinen Map-Zugriff"
+            case .error(let m): return "❌ \(m)"
+            }
+        }
+        var color: Color {
+            switch self {
+            case .ok:          return .green
+            case .fail, .error: return .red
+            default:           return .secondary
+            }
+        }
+    }
+
+    private var trimmed: String { tempKey.trimmingCharacters(in: .whitespacesAndNewlines) }
+
+    var body: some View {
+        Form {
+            Section {
+                HStack {
+                    if showKey {
+                        TextField("API-Key eingeben…", text: $tempKey)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.never)
+                            .font(.system(.body, design: .monospaced))
+                    } else {
+                        SecureField("API-Key eingeben…", text: $tempKey)
+                    }
+                    Button { showKey.toggle() } label: {
+                        Image(systemName: showKey ? "eye.slash" : "eye")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Button("Speichern") {
+                    apiKey = trimmed
+                    testStatus = .idle
+                }
+                .disabled(trimmed.isEmpty || trimmed == apiKey)
+
+                Button("Map-Tile testen") {
+                    Task { await testKey() }
+                }
+                .disabled(trimmed.isEmpty)
+
+                if testStatus.label != "" {
+                    Text(testStatus.label)
+                        .font(.caption)
+                        .foregroundStyle(testStatus.color)
+                }
+            } header: {
+                Text("OpenWeatherMap API-Key")
+            } footer: {
+                Text("Key unter openweathermap.org → \"My API Keys\" kopieren.")
+            }
+
+            if !apiKey.isEmpty {
+                Section {
+                    HStack {
+                        Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                        Text("Key gespeichert (\(apiKey.prefix(6))…\(apiKey.suffix(4)))")
+                            .font(.caption)
+                    }
+                    Button("Key löschen", role: .destructive) { apiKey = ""; tempKey = ""; testStatus = .idle }
+                }
+            }
+        }
+        .navigationTitle("OpenWeatherMap")
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear { tempKey = apiKey }
+    }
+
+    private func testKey() async {
+        testStatus = .testing
+        // Test with a known tile (zoom 5, x=16, y=11 = Europe/Atlantic)
+        let urlStr = "https://tile.openweathermap.org/map/clouds_new/5/16/11.png?appid=\(trimmed)"
+        guard let url = URL(string: urlStr) else { testStatus = .error("Ungültige URL"); return }
+        do {
+            let (_, response) = try await URLSession.shared.data(from: url)
+            let code = (response as? HTTPURLResponse)?.statusCode ?? 0
+            testStatus = code == 200 ? .ok(code) : .fail(code)
+        } catch {
+            testStatus = .error(error.localizedDescription)
         }
     }
 }

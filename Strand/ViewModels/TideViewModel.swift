@@ -33,16 +33,13 @@ final class TideViewModel {
     var beachWalkThresholdLikely: Double {
         didSet { UserDefaults.standard.set(beachWalkThresholdLikely, forKey: "beachWalkThresholdLikely") }
     }
-    /// Schriftgröße für Zeiten/Höhen in der Tabelle
-    var tableFontSize: Double {
-        didSet { UserDefaults.standard.set(tableFontSize, forKey: "tableFontSize") }
-    }
 
     // MARK: - State
 
     var tideDays: [TideDay] = []
     var weatherDays: [WeatherDay] = []
-    var hourlyTemps: [HourlyTemp] = []
+    var hourlyWeather: [HourlyWeather] = []
+    var hourlyMarine: [HourlyMarine] = []
     var isLoading = false
     var errorMessage: String?
     var lastUpdated: Date?
@@ -66,8 +63,6 @@ final class TideViewModel {
         let storedLikely = UserDefaults.standard.object(forKey: "beachWalkThresholdLikely") as? Double
         beachWalkThresholdLikely = storedLikely ?? 0.9
 
-        let storedFont = UserDefaults.standard.object(forKey: "tableFontSize") as? Double
-        tableFontSize = storedFont ?? 14.0
     }
 
     // MARK: - Data Loading
@@ -81,6 +76,7 @@ final class TideViewModel {
             timeOffsetMinutes: timeOffsetMinutes
         )
         async let weatherFetch = WeatherService.shared.fetchWeather(days: Self.totalDays)
+        async let marineFetch = MarineService.shared.fetchMarine(days: Self.totalDays)
 
         do {
             var days = try await tideFetch
@@ -93,7 +89,11 @@ final class TideViewModel {
         // Weather failures are non-fatal
         if let wx = try? await weatherFetch {
             weatherDays = wx.days
-            hourlyTemps = wx.hourly
+            hourlyWeather = wx.hourly
+        }
+        // Marine failures are non-fatal
+        if let marine = try? await marineFetch {
+            hourlyMarine = marine
         }
         lastUpdated = Date()
         isLoading = false
@@ -102,8 +102,11 @@ final class TideViewModel {
     @MainActor
     func reload() async {
         tideDays = []
-        weatherDays = []
-        hourlyTemps = []
+        // weatherDays and hourlyWeather are intentionally NOT cleared here.
+        // Keeping old weather data visible during a reload prevents the table from
+        // going blank if the network fetch fails (e.g. triggered by an accidental
+        // pull-to-refresh while the List re-layouts after a font-size change).
+        // loadTides() will overwrite weather data if the fresh fetch succeeds.
         await loadTides()
     }
 
@@ -143,10 +146,10 @@ final class TideViewModel {
 
     // MARK: - Weather Lookup
 
-    /// Returns hourly temps for a window of `dayCount` days starting at `startDate`
-    func hourlyTemps(from startDate: Date, dayCount: Int) -> [HourlyTemp] {
+    /// Returns hourly weather data for a window of `dayCount` days starting at `startDate`
+    func hourlyWeather(from startDate: Date, dayCount: Int) -> [HourlyWeather] {
         let end = Calendar.current.date(byAdding: .day, value: dayCount, to: startDate)!
-        return hourlyTemps.filter { $0.time >= startDate && $0.time < end }
+        return hourlyWeather.filter { $0.time >= startDate && $0.time < end }
     }
 
     func weather(for date: Date) -> WeatherDay? {
@@ -155,6 +158,35 @@ final class TideViewModel {
         cal.timeZone = canary
         let target = cal.startOfDay(for: date)
         return weatherDays.first { cal.startOfDay(for: $0.date) == target }
+    }
+
+    // MARK: - Marine Lookup
+
+    /// Returns hourly marine data for a window of `dayCount` days starting at `startDate`
+    func marineData(from startDate: Date, dayCount: Int) -> [HourlyMarine] {
+        let end = Calendar.current.date(byAdding: .day, value: dayCount, to: startDate)!
+        return hourlyMarine.filter { $0.time >= startDate && $0.time < end }
+    }
+
+    /// Nearest hourly wave height for a given point in time
+    func waveHeight(at date: Date) -> Double? {
+        hourlyMarine.min(by: {
+            abs($0.time.timeIntervalSince(date)) < abs($1.time.timeIntervalSince(date))
+        })?.waveHeight
+    }
+
+    /// Mean water temperature for the calendar day of `date`
+    func meanWaterTemp(for date: Date) -> Double? {
+        let canary = TideService.canaryIslandsTimeZone
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = canary
+        let startOfDay = cal.startOfDay(for: date)
+        let endOfDay   = cal.date(byAdding: .day, value: 1, to: startOfDay)!
+        let temps = hourlyMarine
+            .filter { $0.time >= startOfDay && $0.time < endOfDay }
+            .compactMap(\.waterTemp)
+        guard !temps.isEmpty else { return nil }
+        return temps.reduce(0, +) / Double(temps.count)
     }
 
     // MARK: - Chart Data

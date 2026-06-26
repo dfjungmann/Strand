@@ -2,6 +2,17 @@ import SwiftUI
 
 struct TableView: View {
     let viewModel: TideViewModel
+    @Binding var selectedTab: Int
+
+    @State private var selectedDay: TideDay?
+    @AppStorage("showAstronomy") private var showAstronomy = true
+    @AppStorage("showWeather")   private var showWeather   = true
+    @AppStorage("showWaves")     private var showWaves     = true
+    // Read font size once at TableView level so only one view re-renders when
+    // it changes, rather than all 10 CompactDayRow instances simultaneously.
+    // Simultaneous height changes in a List can accidentally trigger the
+    // UIRefreshControl (pull-to-refresh) when the list is scrolled to the top.
+    @AppStorage("tableFontSize") private var tableFontSize = 14.0
 
     var body: some View {
         NavigationStack {
@@ -14,29 +25,65 @@ struct TableView: View {
                     tideList
                 }
             }
-            .navigationTitle("Gezeiten")
-            .navigationBarTitleDisplayMode(.large)
+            .navigationBarTitleDisplayMode(.inline)
             .sheet(item: $selectedDay) { day in
                 DayDetailView(day: day, viewModel: viewModel)
                     .interactiveDismissDisabled(false)
             }
             .toolbar {
+                ToolbarItem(placement: .principal) {
+                    Text("Strand & Meer")
+                        .font(.headline)
+                }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    refreshButton
+                    HStack(spacing: 4) {
+                        Button {
+                            showAstronomy.toggle()
+                        } label: {
+                            Image(systemName: showAstronomy ? "sun.horizon.fill" : "sun.horizon")
+                                .foregroundStyle(showAstronomy ? .yellow : .secondary)
+                        }
+                        Button {
+                            showWeather.toggle()
+                        } label: {
+                            Image(systemName: showWeather ? "cloud.sun.fill" : "cloud.sun")
+                                .foregroundStyle(showWeather ? .blue : .secondary)
+                        }
+                        Button {
+                            showWaves.toggle()
+                        } label: {
+                            Image(systemName: showWaves ? "water.waves" : "water.waves.slash")
+                                .foregroundStyle(showWaves ? .teal : .secondary)
+                        }
+                    }
                 }
             }
         }
+        // Swipe left → switch to Uhr tab (tab 1)
+        // simultaneousGesture lets the List scroll vertically as usual;
+        // only a clearly horizontal drag (|dx| > 2×|dy|, > 60 pt) triggers the tab switch.
+        .simultaneousGesture(
+            DragGesture(minimumDistance: 60)
+                .onEnded { v in
+                    guard abs(v.translation.width) > abs(v.translation.height) * 2 else { return }
+                    if v.translation.width < -60 { withAnimation { selectedTab = 1 } }
+                }
+        )
     }
 
     // MARK: - List
 
-    @State private var selectedDay: TideDay?
-
     private var tideList: some View {
         List {
-            ForEach(viewModel.tideDays) { day in
-                CompactDayRow(day: day, viewModel: viewModel)
+                ForEach(Array(viewModel.tideDays.enumerated()), id: \.offset) { index, day in
+                CompactDayRow(day: day, viewModel: viewModel,
+                              showAstronomy: showAstronomy,
+                              showWeather: showWeather,
+                              showWaves: showWaves,
+                              fontSize: tableFontSize,
+                              isAlternate: index % 2 == 1)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
+                    .listRowBackground(index % 2 == 1 ? Color.primary.opacity(0.04) : Color.clear)
                     .contentShape(Rectangle())
                     .onTapGesture { selectedDay = day }
             }
@@ -53,6 +100,9 @@ struct TableView: View {
             }
         }
         .listStyle(.plain)
+        .refreshable {
+            await viewModel.reload()
+        }
     }
 
     private var offsetDescription: String {
@@ -77,11 +127,7 @@ struct TableView: View {
         )
     }
 
-    private var refreshButton: some View {
-        Button { Task { await viewModel.reload() } } label: {
-            Image(systemName: "arrow.clockwise")
-        }
-    }
+
 }
 
 // MARK: - Compact Day Row
@@ -89,6 +135,17 @@ struct TableView: View {
 struct CompactDayRow: View {
     let day: TideDay
     let viewModel: TideViewModel
+    var showAstronomy: Bool = true
+    var showWeather: Bool   = true
+    var showWaves: Bool     = true
+    var fontSize: Double    = 14.0
+    var isAlternate: Bool   = false
+
+    private var bestBeachWalkColor: Color? {
+        if day.events.contains(where: { $0.beachWalkStatus == .safe })   { return Color(.systemGreen) }
+        if day.events.contains(where: { $0.beachWalkStatus == .likely }) { return Color(.systemYellow) }
+        return nil
+    }
 
     private var astronomy: AstronomyData {
         AstronomyService.data(for: day.date)
@@ -134,29 +191,48 @@ struct CompactDayRow: View {
 
             // ── Tag-Header ──
             HStack {
-                Text(viewModel.formatDayHeader(day.date))
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
+                HStack(spacing: 4) {
+                    Text(viewModel.formatDayHeader(day.date))
+                        .font(.headline)
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+                .foregroundStyle(.tint)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 3)
+                .background(Color.accentColor.opacity(0.08))
+                .clipShape(Capsule())
                 Spacer()
-                if day.hasBeachWalkOpportunity {
+                // Wassertemperatur (Tagesmittel) neben dem Titel
+                if let waterTemp = viewModel.meanWaterTemp(for: day.date) {
                     HStack(spacing: 3) {
-                        Image(systemName: "figure.walk")
+                        Image(systemName: "thermometer.medium").foregroundStyle(.teal)
+                        Text(String(format: "%.1f°", waterTemp)).foregroundStyle(.teal)
+                    }
+                    .font(.caption)
+                }
+                if let beachColor = bestBeachWalkColor {
+                    HStack(spacing: 3) {
+                        Image(systemName: "beach.umbrella")
                         Text("Strandgang")
                     }
                     .font(.caption2)
                     .padding(.horizontal, 7)
                     .padding(.vertical, 3)
-                    .background(Color.green.opacity(0.15))
-                    .foregroundStyle(.green)
+                    .background(beachColor.opacity(0.2))
+                    .foregroundStyle(beachColor)
                     .clipShape(Capsule())
                 }
             }
 
             // ── Spalten: Zeit + Höhe übereinander, Strandgang farbig ──
-            let fontSize = viewModel.tableFontSize
             HStack(spacing: 4) {
                 ForEach(day.events) { event in
-                    let tideColor: Color = event.type == .highTide ? .blue : .orange
+                    let isHigh    = event.type == .highTide
+                    let tideColor: Color = isHigh ? .blue : .orange
+                    // High tide: 2 steps smaller (factor 0.82 ≈ two typography steps)
+                    let scale: CGFloat   = isHigh ? 0.82 : 1.0
                     let bgColor: Color = {
                         switch event.beachWalkStatus {
                         case .safe:   return .green
@@ -169,15 +245,15 @@ struct CompactDayRow: View {
 
                     VStack(spacing: 2) {
                         HStack(spacing: 3) {
-                            Image(systemName: event.type == .highTide ? "arrow.up" : "arrow.down")
-                                .font(.system(size: fontSize * 0.65, weight: .bold))
+                            Image(systemName: isHigh ? "arrow.up" : "arrow.down")
+                                .font(.system(size: fontSize * scale * 0.65, weight: .bold))
                                 .foregroundStyle(onBg ? textOnBg : tideColor)
                             Text(viewModel.formatTime(event.adjustedTime))
-                                .font(.system(size: fontSize, weight: .medium).monospacedDigit())
+                                .font(.system(size: fontSize * scale, weight: .medium).monospacedDigit())
                                 .foregroundStyle(onBg ? textOnBg : .primary)
                         }
                         Text(event.heightFormatted)
-                            .font(.system(size: fontSize * 0.9).monospacedDigit())
+                            .font(.system(size: fontSize * scale * 0.9).monospacedDigit())
                             .foregroundStyle(onBg ? textOnBg : tideColor)
                     }
                     .padding(.horizontal, 4)
@@ -188,30 +264,55 @@ struct CompactDayRow: View {
                 }
             }
 
-            // ── Sonne & Mond ──
-            HStack(spacing: 16) {
-                if let rise = astronomy.sunrise {
-                    HStack(spacing: 4) {
-                        Image(systemName: "sunrise.fill").foregroundStyle(.yellow)
-                        Text(viewModel.formatTime(rise)).monospacedDigit()
-                    }
-                }
-                if let set = astronomy.sunset {
-                    HStack(spacing: 4) {
-                        Image(systemName: "sunset.fill").foregroundStyle(.orange)
-                        Text(viewModel.formatTime(set)).monospacedDigit()
-                    }
-                }
-                Spacer()
+            // ── Wellenhöhe zu den Tidenzeiten ──
+            if showWaves && !viewModel.hourlyMarine.isEmpty {
                 HStack(spacing: 4) {
-                    Text(astronomy.moonPhase.emoji)
-                    Text(astronomy.moonPhase.rawValue).foregroundStyle(.secondary)
+                    ForEach(day.events) { event in
+                        let wh = viewModel.waveHeight(at: event.adjustedTime)
+                        HStack(spacing: 3) {
+                            Image(systemName: "water.waves")
+                                .font(.system(size: fontSize * 0.65))
+                                .foregroundStyle(.teal)
+                            if let wh {
+                                Text(String(format: "%.1fm", wh))
+                                    .font(.system(size: fontSize * 0.9).monospacedDigit())
+                                    .foregroundStyle(.teal)
+                            } else {
+                                Text("—").foregroundStyle(.secondary)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
                 }
+                .padding(.horizontal, 4)
             }
-            .font(.caption)
+
+            // ── Sonne & Mond ──
+            if showAstronomy {
+                HStack(spacing: 16) {
+                    if let rise = astronomy.sunrise {
+                        HStack(spacing: 4) {
+                            Image(systemName: "sunrise.fill").foregroundStyle(.yellow)
+                            Text(viewModel.formatTime(rise)).monospacedDigit()
+                        }
+                    }
+                    if let set = astronomy.sunset {
+                        HStack(spacing: 4) {
+                            Image(systemName: "sunset.fill").foregroundStyle(.orange)
+                            Text(viewModel.formatTime(set)).monospacedDigit()
+                        }
+                    }
+                    Spacer()
+                    HStack(spacing: 4) {
+                        Text(astronomy.moonPhase.emoji)
+                        Text(astronomy.moonPhase.rawValue).foregroundStyle(.secondary)
+                    }
+                }
+                .font(.caption)
+            }
 
             // ── Wetter ──
-            if let wx = viewModel.weather(for: day.date) {
+            if showWeather, let wx = viewModel.weather(for: day.date) {
                 HStack(spacing: 14) {
                     // Temperatur
                     HStack(spacing: 3) {
@@ -246,5 +347,6 @@ struct CompactDayRow: View {
                 .padding(.top, 2)
         }
         .padding(.vertical, 2)
+        .background(isAlternate ? Color.primary.opacity(0.04) : Color.clear)
     }
 }

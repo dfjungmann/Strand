@@ -1,38 +1,36 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var viewModel = TideViewModel()
+    @State private var viewModel   = TideViewModel()
     @State private var selectedTab = 0
 
     var body: some View {
         TabView(selection: $selectedTab) {
-            TableView(viewModel: viewModel)
-                .tabItem {
-                    Label("Tabelle", systemImage: "list.bullet")
-                }
+            TableView(viewModel: viewModel, selectedTab: $selectedTab)
+                .tabItem { Label("Tabelle", systemImage: "list.bullet") }
                 .tag(0)
 
-            ChartView(viewModel: viewModel)
-                .tabItem {
-                    Label("Diagramm", systemImage: "chart.line.uptrend.xyaxis")
-                }
+            TideClockView(viewModel: viewModel, selectedTab: $selectedTab)
+                .tabItem { Label("Uhr", systemImage: "clock") }
                 .tag(1)
 
-            BeachWalkView(viewModel: viewModel)
-                .tabItem {
-                    Label("Strandgang", systemImage: "figure.walk")
-                }
+            VerlaufView(viewModel: viewModel)
+                .tabItem { Label("Verlauf", systemImage: "chart.xyaxis.line") }
                 .tag(2)
 
-            SettingsView(viewModel: viewModel)
-                .tabItem {
-                    Label("Einstellungen", systemImage: "gearshape")
-                }
+            WeatherForecastView()
+                .tabItem { Label("Wetter", systemImage: "cloud.sun.fill") }
                 .tag(3)
+
+            WeatherMapView(selectedTab: $selectedTab)
+                .tabItem { Label("Radar", systemImage: "dot.radiowaves.left.and.right") }
+                .tag(4)
+
+            SettingsView(viewModel: viewModel)
+                .tabItem { Label("Einstellungen", systemImage: "gearshape") }
+                .tag(5)
         }
-        .task {
-            await viewModel.loadTides()
-        }
+        .task { await viewModel.loadTides() }
     }
 }
 
