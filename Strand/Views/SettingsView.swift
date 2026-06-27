@@ -116,26 +116,32 @@ struct SettingsView: View {
     // MARK: - Strandgang
 
     private var strandgangSection: some View {
-        Section {
+        // Angezeigte Schwellwerte = Rohwert − Referenzoffset (gleiche Verschiebung wie die Höhenanzeige)
+        // Offset in Meter – Bindings rechnen zwischen Display-Wert und gespeichertem Rohwert
+        let offsetM = Double(viewModel.tideReferenceOffsetCm) / 100.0
+        let safeDisplay  = viewModel.beachWalkThresholdSafe   - offsetM
+        let likelyDisplay = viewModel.beachWalkThresholdLikely - offsetM
+        return Section {
             // Sicher (grün)
             HStack {
                 Circle().fill(.green).frame(width: 10, height: 10)
                 Text("Sicher")
                 Spacer()
-                Text(String(format: "%.0f cm", viewModel.beachWalkThresholdSafe * 100))
+                Text(String(format: "%.0f cm", safeDisplay * 100))
                     .foregroundStyle(.secondary).monospacedDigit()
             }
             Stepper(
                 value: Binding(
-                    get: { viewModel.beachWalkThresholdSafe },
-                    set: {
-                        viewModel.beachWalkThresholdSafe = $0
-                        if viewModel.beachWalkThresholdLikely < $0 {
-                            viewModel.beachWalkThresholdLikely = $0
+                    get: { safeDisplay },
+                    set: { display in
+                        let raw = display + offsetM
+                        viewModel.beachWalkThresholdSafe = raw
+                        if viewModel.beachWalkThresholdLikely < raw {
+                            viewModel.beachWalkThresholdLikely = raw
                         }
                     }
                 ),
-                in: 0.10...1.50, step: 0.01
+                in: -1.50...1.50, step: 0.01
             ) { EmptyView() }
 
             // Wahrscheinlich (gelb)
@@ -143,18 +149,22 @@ struct SettingsView: View {
                 Circle().fill(.yellow).frame(width: 10, height: 10)
                 Text("Wahrscheinlich")
                 Spacer()
-                Text(String(format: "%.0f cm", viewModel.beachWalkThresholdLikely * 100))
+                Text(String(format: "%.0f cm", likelyDisplay * 100))
                     .foregroundStyle(.secondary).monospacedDigit()
             }
             Stepper(
                 value: Binding(
-                    get: { viewModel.beachWalkThresholdLikely },
-                    set: { viewModel.beachWalkThresholdLikely = max($0, viewModel.beachWalkThresholdSafe) }
+                    get: { likelyDisplay },
+                    set: { display in
+                        let raw = display + offsetM
+                        viewModel.beachWalkThresholdLikely = max(raw, viewModel.beachWalkThresholdSafe)
+                    }
                 ),
-                in: 0.10...1.50, step: 0.01
+                in: -1.50...1.50, step: 0.01
             ) { EmptyView() }
 
-            Button("Standard zurücksetzen (60 cm / 90 cm)") {
+            Button("Standard zurücksetzen (−60 cm / −30 cm bei 120 cm Offset)") {
+                // Rohwerte 0.60 / 0.90 m entsprechen mit 120 cm Offset: −60 cm / −30 cm
                 viewModel.beachWalkThresholdSafe   = 0.6
                 viewModel.beachWalkThresholdLikely = 0.9
             }
@@ -162,7 +172,7 @@ struct SettingsView: View {
         } header: {
             Text("Strandspaziergang")
         } footer: {
-            Text("🟢 Sicher: Niedrigwasser unter diesem Wert = grün.\n🟡 Wahrscheinlich: zwischen Sicher und diesem Wert = gelb.\nVor Ort kalibrierbar.")
+            Text("🟢 Sicher: Niedrigwasser unter diesem Wert = grün.\n🟡 Wahrscheinlich: zwischen Sicher und diesem Wert = gelb.\nWerte in angezeigten Höhen (inkl. Referenzverschiebung). Standard: −60 cm / −30 cm bei 120 cm Offset.")
         }
     }
 
