@@ -163,16 +163,16 @@ struct SettingsView: View {
                 in: -1.50...1.50, step: 0.01
             ) { EmptyView() }
 
-            Button("Standard zurücksetzen (−60 cm / −30 cm bei 120 cm Offset)") {
-                // Rohwerte 0.60 / 0.90 m entsprechen mit 120 cm Offset: −60 cm / −30 cm
-                viewModel.beachWalkThresholdSafe   = 0.6
-                viewModel.beachWalkThresholdLikely = 0.9
+            Button("Standard zurücksetzen (−65 cm / −55 cm bei 120 cm Offset)") {
+                // Rohwerte 0.55 / 0.65 m entsprechen mit 120 cm Offset: −65 cm / −55 cm
+                viewModel.beachWalkThresholdSafe   = 0.55
+                viewModel.beachWalkThresholdLikely = 0.65
             }
             .foregroundStyle(.blue)
         } header: {
             Text("Strandspaziergang")
         } footer: {
-            Text("🟢 Sicher: Niedrigwasser unter diesem Wert = grün.\n🟡 Wahrscheinlich: zwischen Sicher und diesem Wert = gelb.\nWerte in angezeigten Höhen (inkl. Referenzverschiebung). Standard: −60 cm / −30 cm bei 120 cm Offset.")
+            Text("🟢 Sicher: Niedrigwasser unter diesem Wert = grün.\n🟡 Wahrscheinlich: zwischen Sicher und diesem Wert = gelb.\nWerte in angezeigten Höhen (inkl. Referenzverschiebung). Standard: −65 cm / −55 cm bei 120 cm Offset.")
         }
     }
 

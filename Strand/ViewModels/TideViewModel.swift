@@ -62,10 +62,10 @@ final class TideViewModel {
         timeOffsetMinutes = storedTimeOffset ?? 0
 
         let storedSafe = UserDefaults.standard.object(forKey: "beachWalkThresholdSafe") as? Double
-        beachWalkThresholdSafe = storedSafe ?? 0.6
+        beachWalkThresholdSafe = storedSafe ?? 0.55
 
         let storedLikely = UserDefaults.standard.object(forKey: "beachWalkThresholdLikely") as? Double
-        beachWalkThresholdLikely = storedLikely ?? 0.9
+        beachWalkThresholdLikely = storedLikely ?? 0.65
 
         let storedRefOffset = UserDefaults.standard.object(forKey: "tide_reference_offset_cm") as? Int
         tideReferenceOffsetCm = storedRefOffset ?? 0

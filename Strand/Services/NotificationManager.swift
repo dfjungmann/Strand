@@ -119,7 +119,7 @@ final class NotificationManager {
             guard !body.isEmpty else { continue }
 
             let content = UNMutableNotificationContent()
-            content.title = "🏖️ Strand · Playa del Aguila"
+            content.title = "🏖️ Strandy · Playa del Aguila"
             content.body = body
             content.sound = .default
 
@@ -352,7 +352,7 @@ final class NotificationManager {
         }
 
         let content = UNMutableNotificationContent()
-        content.title = "🧪 Strand Test"
+        content.title = "🧪 Strandy Test"
         content.body = bodyParts.isEmpty
             ? "Testdaten: Ebbe um 14:30 (0.4m) · 22.1°C"
             : bodyParts.joined(separator: " · ")
