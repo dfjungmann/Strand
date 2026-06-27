@@ -33,6 +33,10 @@ final class TideViewModel {
     var beachWalkThresholdLikely: Double {
         didSet { UserDefaults.standard.set(beachWalkThresholdLikely, forKey: "beachWalkThresholdLikely") }
     }
+    /// Offset in cm subtrahiert von Rohwert (SKN) für die Anzeige; 0 = Seekartennull, ~120 = Mittelwasser
+    var tideReferenceOffsetCm: Int {
+        didSet { UserDefaults.standard.set(tideReferenceOffsetCm, forKey: "tide_reference_offset_cm") }
+    }
 
     // MARK: - State
 
@@ -55,7 +59,7 @@ final class TideViewModel {
         chartStartOffset = (0...2).contains(storedOffset) ? storedOffset : 0
 
         let storedTimeOffset = UserDefaults.standard.object(forKey: "timeOffsetMinutes") as? Int
-        timeOffsetMinutes = storedTimeOffset ?? -15
+        timeOffsetMinutes = storedTimeOffset ?? 0
 
         let storedSafe = UserDefaults.standard.object(forKey: "beachWalkThresholdSafe") as? Double
         beachWalkThresholdSafe = storedSafe ?? 0.6
@@ -63,6 +67,8 @@ final class TideViewModel {
         let storedLikely = UserDefaults.standard.object(forKey: "beachWalkThresholdLikely") as? Double
         beachWalkThresholdLikely = storedLikely ?? 0.9
 
+        let storedRefOffset = UserDefaults.standard.object(forKey: "tide_reference_offset_cm") as? Int
+        tideReferenceOffsetCm = storedRefOffset ?? 0
     }
 
     // MARK: - Data Loading
@@ -229,6 +235,17 @@ final class TideViewModel {
         return days.dropFirst().compactMap { day in
             Calendar.current.startOfDay(for: day.date)
         }
+    }
+
+    // MARK: - Display Height
+
+    /// Verschiebt Rohwert (Seekartennull-Referenz) um den konfigurierten Offset für die Anzeige.
+    func displayHeight(_ rawHeight: Double) -> Double {
+        rawHeight - Double(tideReferenceOffsetCm) / 100.0
+    }
+
+    func displayHeightFormatted(_ rawHeight: Double) -> String {
+        String(format: "%.2f m", displayHeight(rawHeight))
     }
 
     // MARK: - Formatting

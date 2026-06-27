@@ -109,7 +109,7 @@ struct BeachDayCard: View {
                     Text(viewModel.formatDayHeader(day.date))
                         .font(.headline)
                     if let lowest = day.lowestTide {
-                        Text("Niedrigstes NW: \(lowest.heightFormatted)")
+                        Text("Niedrigstes NW: \(viewModel.displayHeightFormatted(lowest.height))")
                             .font(.caption)
                             .foregroundStyle(.secondary)
                     }
@@ -214,7 +214,7 @@ struct LowTideRow: View {
             Spacer()
 
             VStack(alignment: .trailing, spacing: 4) {
-                Text(event.heightFormatted)
+                Text(viewModel.displayHeightFormatted(event.height))
                     .font(.headline)
                     .monospacedDigit()
                     .foregroundStyle(statusColor)

@@ -257,7 +257,7 @@ private struct DayDetailContent: View {
                         VStack(spacing: 1) {
                             Text(viewModel.formatTime(e.adjustedTime))
                                 .font(.system(size: 9).monospacedDigit()).foregroundStyle(.secondary)
-                            Text(e.heightFormatted)
+                            Text(viewModel.displayHeightFormatted(e.height))
                                 .font(.system(size: 9).monospacedDigit()).fontWeight(.semibold)
                                 .foregroundStyle(e.type == .highTide ? .blue : .orange)
                         }

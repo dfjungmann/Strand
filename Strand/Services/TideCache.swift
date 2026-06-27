@@ -16,20 +16,20 @@ actor TideCache {
 
     // MARK: - Public Interface
 
-    func load(for date: Date) -> IHMResponse? {
-        let url = cacheURL(for: date)
+    func load(for date: Date, stationID: String) -> IHMResponse? {
+        let url = cacheURL(for: date, stationID: stationID)
         guard let data = try? Data(contentsOf: url) else { return nil }
         return try? JSONDecoder().decode(IHMResponse.self, from: data)
     }
 
-    func save(_ response: IHMResponse, for date: Date) {
-        let url = cacheURL(for: date)
+    func save(_ response: IHMResponse, for date: Date, stationID: String) {
+        let url = cacheURL(for: date, stationID: stationID)
         guard let data = try? JSONEncoder().encode(response) else { return }
         try? data.write(to: url, options: .atomic)
     }
 
-    func isCached(for date: Date) -> Bool {
-        FileManager.default.fileExists(atPath: cacheURL(for: date).path)
+    func isCached(for date: Date, stationID: String) -> Bool {
+        FileManager.default.fileExists(atPath: cacheURL(for: date, stationID: stationID).path)
     }
 
     func clearAll() {
@@ -54,15 +54,17 @@ actor TideCache {
         }
     }
 
+    /// Count of cached days (based on Arinaga station files; each day has one file per station).
     var cachedDayCount: Int {
-        (try? FileManager.default.contentsOfDirectory(atPath: cacheDirectory.path).count) ?? 0
+        let files = (try? FileManager.default.contentsOfDirectory(atPath: cacheDirectory.path)) ?? []
+        return files.filter { $0.contains("_57_") }.count
     }
 
     // MARK: - Helpers
 
-    private func cacheURL(for date: Date) -> URL {
+    private func cacheURL(for date: Date, stationID: String) -> URL {
         let key = Self.dateKey(date)
-        return cacheDirectory.appendingPathComponent("tide_\(key).json")
+        return cacheDirectory.appendingPathComponent("tide_\(stationID)_\(key).json")
     }
 
     static func dateKey(_ date: Date) -> String {

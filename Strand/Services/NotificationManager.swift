@@ -276,7 +276,7 @@ final class NotificationManager {
 
             let hoursText = prewalkHours == 1 ? "1 Stunde" : "\(prewalkHours) Stunden"
             let content = UNMutableNotificationContent()
-            content.title = "🏖️ Strandgang in \(hoursText)"
+            content.title = "🏖️ Strandy in \(hoursText)"
             content.body = "\(walkStatusEmoji(event)) \(timeFmt.string(from: event.adjustedTime)) (\(String(format: "%.1f", event.height))m)"
             content.sound = .default
 
@@ -310,7 +310,7 @@ final class NotificationManager {
             guard triggerHour >= windowStart, triggerHour < windowEnd else { continue }
 
             let content = UNMutableNotificationContent()
-            content.title = "🏖️ Jetzt Strandgang möglich"
+            content.title = "🏖️ Jetzt Strandy möglich"
             content.body = "\(walkStatusEmoji(event)) \(timeFmt.string(from: event.adjustedTime)) (\(String(format: "%.1f", event.height))m)"
             content.sound = .default
 

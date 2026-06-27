@@ -252,7 +252,7 @@ struct CompactDayRow: View {
                                 .font(.system(size: fontSize * scale, weight: .medium).monospacedDigit())
                                 .foregroundStyle(onBg ? textOnBg : .primary)
                         }
-                        Text(event.heightFormatted)
+                        Text(viewModel.displayHeightFormatted(event.height))
                             .font(.system(size: fontSize * scale * 0.9).monospacedDigit())
                             .foregroundStyle(onBg ? textOnBg : tideColor)
                     }

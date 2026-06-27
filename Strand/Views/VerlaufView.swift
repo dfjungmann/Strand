@@ -495,7 +495,7 @@ struct VerlaufView: View {
                     AreaMark(
                         x: .value("Zeit", p.time),
                         yStart: .value("0", 0.0),
-                        yEnd: .value("Höhe", p.height)
+                        yEnd: .value("Höhe", viewModel.displayHeight(p.height))
                     )
                     .foregroundStyle(.linearGradient(
                         colors: [.blue.opacity(0.25), .blue.opacity(0.03)],
@@ -505,7 +505,7 @@ struct VerlaufView: View {
                 ForEach(pts) { p in
                     LineMark(
                         x: .value("Zeit", p.time),
-                        y: .value("Höhe", p.height)
+                        y: .value("Höhe", viewModel.displayHeight(p.height))
                     )
                     .foregroundStyle(.blue)
                     .lineStyle(StrokeStyle(lineWidth: 2))

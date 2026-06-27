@@ -187,7 +187,7 @@ struct ChartView: View {
                 .foregroundStyle(event.type == .highTide ? Color.blue : Color.orange)
                 .symbolSize(55)
                 .annotation(position: event.type == .highTide ? .top : .bottom, spacing: 2) {
-                    Text(event.heightFormatted)
+                    Text(viewModel.displayHeightFormatted(event.height))
                         .font(.system(size: 9).monospacedDigit())
                         .fontWeight(.medium)
                         .foregroundStyle(event.type == .highTide ? .blue : .orange)
@@ -258,7 +258,7 @@ struct ChartView: View {
                             Text(viewModel.formatTime(event.adjustedTime))
                                 .font(.subheadline)
                                 .monospacedDigit()
-                            Text(event.heightFormatted)
+                            Text(viewModel.displayHeightFormatted(event.height))
                                 .font(.subheadline)
                                 .monospacedDigit()
                                 .fontWeight(.medium)

@@ -3,7 +3,14 @@ import Foundation
 actor TideService {
     static let shared = TideService()
 
-    private let stationID = "56"  // Puerto de la Luz, Gran Canaria
+    // IHM stations used for interpolation (Playa del Águila ~27.777°N, 15.527°W)
+    private let stationArinaga = "57"       // Arinaga, Ostküste  27.847°N
+    private let stationPasitoBlanco = "58"  // Pasito Blanco, Südküste  27.747°N
+
+    // Distance-based weights: Pasito Blanco is closer → 60 %
+    private static let weightArinaga: Double = 0.4
+    private static let weightPasitoBlanco: Double = 0.6
+
     private let baseURL = "https://ideihm.covam.es/api-ihm/getmarea"
 
     static let canaryIslandsTimeZone = TimeZone(identifier: "Atlantic/Canary")!
@@ -18,11 +25,10 @@ actor TideService {
     // MARK: - Public API
 
     /// Fetches tide data for `days` days starting from today.
-    /// Uses cache for already-loaded days; only fetches missing ones from the network.
+    /// Loads from cache where available; fetches missing days from both stations in parallel.
     func fetchTides(forDays days: Int, timeOffsetMinutes: Int) async throws -> [TideDay] {
         let today = Calendar.current.startOfDay(for: Date())
 
-        // Determine which dates are missing from cache
         let allDates = (0..<days).map { offset in
             Calendar.current.date(byAdding: .day, value: offset, to: today)!
         }
@@ -31,26 +37,35 @@ actor TideService {
         let cachedDateKeys = Set(cachedDays.map { TideCache.dateKey($0.date) })
         let missingDates = allDates.filter { !cachedDateKeys.contains(TideCache.dateKey($0)) }
 
-        // Fetch missing days in parallel
         var fetchedDays: [TideDay] = []
         if !missingDates.isEmpty {
             fetchedDays = try await fetchFromNetwork(dates: missingDates, timeOffsetMinutes: timeOffsetMinutes)
         }
 
-        // Merge and sort
-        let allDays = (cachedDays + fetchedDays).sorted { $0.date < $1.date }
-        return allDays
+        return (cachedDays + fetchedDays).sorted { $0.date < $1.date }
     }
 
     // MARK: - Network
 
     private func fetchFromNetwork(dates: [Date], timeOffsetMinutes: Int) async throws -> [TideDay] {
-        try await withThrowingTaskGroup(of: TideDay.self) { group in
+        // Pre-capture station IDs so they can be used inside @Sendable task closures
+        let sid57 = stationArinaga
+        let sid58 = stationPasitoBlanco
+        return try await withThrowingTaskGroup(of: TideDay.self) { group in
             for date in dates {
                 group.addTask {
-                    let response = try await self.fetchRawResponse(for: date)
-                    await TideCache.shared.save(response, for: date)
-                    return self.parseDay(from: response.mareas, referenceDate: date, timeOffsetMinutes: timeOffsetMinutes)
+                    // Fetch both stations in parallel
+                    async let r57 = self.fetchRawResponse(for: date, stationID: sid57)
+                    async let r58 = self.fetchRawResponse(for: date, stationID: sid58)
+                    let (arinaga, pasitoBlanco) = try await (r57, r58)
+                    await TideCache.shared.save(arinaga, for: date, stationID: sid57)
+                    await TideCache.shared.save(pasitoBlanco, for: date, stationID: sid58)
+                    return self.interpolateDay(
+                        arinaga: arinaga.mareas,
+                        pasitoBlanco: pasitoBlanco.mareas,
+                        referenceDate: date,
+                        timeOffsetMinutes: timeOffsetMinutes
+                    )
                 }
             }
             var results: [TideDay] = []
@@ -59,7 +74,7 @@ actor TideService {
         }
     }
 
-    private func fetchRawResponse(for date: Date) async throws -> IHMResponse {
+    private func fetchRawResponse(for date: Date, stationID: String) async throws -> IHMResponse {
         var components = URLComponents(string: baseURL)!
         components.queryItems = [
             URLQueryItem(name: "request", value: "gettide"),
@@ -81,38 +96,86 @@ actor TideService {
     private func loadFromCache(dates: [Date], timeOffsetMinutes: Int) async -> [TideDay] {
         var days: [TideDay] = []
         for date in dates {
-            if let response = await TideCache.shared.load(for: date) {
-                let day = parseDay(from: response.mareas, referenceDate: date, timeOffsetMinutes: timeOffsetMinutes)
-                days.append(day)
-            }
+            guard let arinaga = await TideCache.shared.load(for: date, stationID: stationArinaga),
+                  let pasitoBlanco = await TideCache.shared.load(for: date, stationID: stationPasitoBlanco)
+            else { continue }
+            let day = interpolateDay(
+                arinaga: arinaga.mareas,
+                pasitoBlanco: pasitoBlanco.mareas,
+                referenceDate: date,
+                timeOffsetMinutes: timeOffsetMinutes
+            )
+            days.append(day)
         }
         return days
     }
 
-    // MARK: - Parsing
+    // MARK: - Interpolation
 
-    nonisolated private func parseDay(from mareas: IHMMareas, referenceDate: Date, timeOffsetMinutes: Int) -> TideDay {
+    /// Merges tide events from Arinaga and Pasito Blanco using distance-weighted averaging.
+    /// Events are matched by type and ordinal position (1st high tide ↔ 1st high tide, etc.).
+    /// If one station has fewer events for a day, the available station's data is used as-is.
+    nonisolated private func interpolateDay(
+        arinaga: IHMMareas,
+        pasitoBlanco: IHMMareas,
+        referenceDate: Date,
+        timeOffsetMinutes: Int
+    ) -> TideDay {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = TideService.canaryIslandsTimeZone
 
-        let events: [TideEvent] = mareas.datos.marea.compactMap { marea in
-            guard let tideType = TideType(rawValue: marea.tipo),
-                  let height = Double(marea.altura),
-                  let originalTime = Self.parseTime(marea.hora, referenceDate: referenceDate, calendar: cal)
-            else { return nil }
+        typealias RawEvent = (type: TideType, time: Date, height: Double)
 
-            let adjustedTime = Calendar.current.date(
-                byAdding: .minute, value: timeOffsetMinutes, to: originalTime
-            ) ?? originalTime
-
-            return TideEvent(
-                originalTime: originalTime,
-                adjustedTime: adjustedTime,
-                height: height,
-                type: tideType,
-                date: referenceDate
-            )
+        func parseRaw(_ mareas: [IHMMarea]) -> [RawEvent] {
+            mareas.compactMap { m in
+                guard let type = TideType(rawValue: m.tipo),
+                      let height = Double(m.altura),
+                      let time = Self.parseTime(m.hora, referenceDate: referenceDate, calendar: cal)
+                else { return nil }
+                return (type, time, height)
+            }.sorted { $0.time < $1.time }
         }
+
+        let aEvents = parseRaw(arinaga.datos.marea)
+        let pEvents = parseRaw(pasitoBlanco.datos.marea)
+
+        let aHigh = aEvents.filter { $0.type == .highTide }
+        let aLow  = aEvents.filter { $0.type == .lowTide }
+        let pHigh = pEvents.filter { $0.type == .highTide }
+        let pLow  = pEvents.filter { $0.type == .lowTide }
+
+        func blend(_ a: RawEvent?, _ p: RawEvent?, type: TideType) -> TideEvent? {
+            let wA = Self.weightArinaga
+            let wP = Self.weightPasitoBlanco
+            let (origTime, height): (Date, Double)
+            switch (a, p) {
+            case let (.some(ae), .some(pe)):
+                let t = ae.time.timeIntervalSince1970 * wA + pe.time.timeIntervalSince1970 * wP
+                origTime = Date(timeIntervalSince1970: t)
+                height = ae.height * wA + pe.height * wP
+            case let (.some(ae), .none):
+                origTime = ae.time; height = ae.height
+            case let (.none, .some(pe)):
+                origTime = pe.time; height = pe.height
+            case (.none, .none):
+                return nil
+            }
+            let adj = Calendar.current.date(byAdding: .minute, value: timeOffsetMinutes, to: origTime) ?? origTime
+            return TideEvent(originalTime: origTime, adjustedTime: adj, height: height, type: type, date: referenceDate)
+        }
+
+        var events: [TideEvent] = []
+        for i in 0..<max(aHigh.count, pHigh.count) {
+            if let e = blend(i < aHigh.count ? aHigh[i] : nil,
+                             i < pHigh.count ? pHigh[i] : nil,
+                             type: .highTide) { events.append(e) }
+        }
+        for i in 0..<max(aLow.count, pLow.count) {
+            if let e = blend(i < aLow.count ? aLow[i] : nil,
+                             i < pLow.count ? pLow[i] : nil,
+                             type: .lowTide) { events.append(e) }
+        }
+
         return TideDay(date: referenceDate, events: events.sorted { $0.adjustedTime < $1.adjustedTime })
     }
 
@@ -120,9 +183,8 @@ actor TideService {
         let parts = timeString.split(separator: ":").compactMap { Int($0) }
         guard parts.count == 2 else { return nil }
         // IHM publishes tide times in UTC (standard for maritime data).
-        // We take the calendar date (year/month/day) in Canary time – matching
-        // the date we queried – but override the time zone to UTC so the
-        // hours/minutes are correctly interpreted as UTC, not as local time.
+        // We take the calendar date in Canary time (matching the queried date) but
+        // override the time zone to UTC so the hours/minutes are interpreted correctly.
         var components = calendar.dateComponents([.year, .month, .day], from: referenceDate)
         components.hour   = parts[0]
         components.minute = parts[1]

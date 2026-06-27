@@ -13,6 +13,7 @@ struct SettingsView: View {
             zeitkorrekturSection
             schriftSection
             datenquelleSection
+            referenzpunktSection
             radarSection
             kiSection
             }
@@ -71,14 +72,14 @@ struct SettingsView: View {
                 EmptyView()
             }
 
-            Button("Auf Standard zurücksetzen (−15 Min.)") {
-                viewModel.timeOffsetMinutes = -15
+            Button("Auf Standard zurücksetzen (0 Min.)") {
+                viewModel.timeOffsetMinutes = 0
             }
             .foregroundStyle(.blue)
         } header: {
             Text("Zeitkorrektur")
         } footer: {
-            Text("Korrektur von Puerto de la Luz auf Playa del Aguila. Negativ = früher.")
+            Text("Feine Zeitkorrektur für Playa del Águila. Interpolation aus Arinaga (40%) + Pasito Blanco (60%) bereits eingerechnet.")
         }
     }
 
@@ -121,10 +122,10 @@ struct SettingsView: View {
                 Circle().fill(.green).frame(width: 10, height: 10)
                 Text("Sicher")
                 Spacer()
-                Text(String(format: "%.2f m", viewModel.beachWalkThresholdSafe))
+                Text(String(format: "%.0f cm", viewModel.beachWalkThresholdSafe * 100))
                     .foregroundStyle(.secondary).monospacedDigit()
             }
-            Slider(
+            Stepper(
                 value: Binding(
                     get: { viewModel.beachWalkThresholdSafe },
                     set: {
@@ -134,30 +135,26 @@ struct SettingsView: View {
                         }
                     }
                 ),
-                in: 0.1...1.5, step: 0.05
-            ) {} minimumValueLabel: { Text("0.1").font(.caption) }
-               maximumValueLabel: { Text("1.5").font(.caption) }
+                in: 0.10...1.50, step: 0.01
+            ) { EmptyView() }
 
             // Wahrscheinlich (gelb)
             HStack {
                 Circle().fill(.yellow).frame(width: 10, height: 10)
                 Text("Wahrscheinlich")
                 Spacer()
-                Text(String(format: "%.2f m", viewModel.beachWalkThresholdLikely))
+                Text(String(format: "%.0f cm", viewModel.beachWalkThresholdLikely * 100))
                     .foregroundStyle(.secondary).monospacedDigit()
             }
-            Slider(
+            Stepper(
                 value: Binding(
                     get: { viewModel.beachWalkThresholdLikely },
-                    set: {
-                        viewModel.beachWalkThresholdLikely = max($0, viewModel.beachWalkThresholdSafe)
-                    }
+                    set: { viewModel.beachWalkThresholdLikely = max($0, viewModel.beachWalkThresholdSafe) }
                 ),
-                in: 0.1...1.5, step: 0.05
-            ) {} minimumValueLabel: { Text("0.1").font(.caption) }
-               maximumValueLabel: { Text("1.5").font(.caption) }
+                in: 0.10...1.50, step: 0.01
+            ) { EmptyView() }
 
-            Button("Standard zurücksetzen (0.60 / 0.90 m)") {
+            Button("Standard zurücksetzen (60 cm / 90 cm)") {
                 viewModel.beachWalkThresholdSafe   = 0.6
                 viewModel.beachWalkThresholdLikely = 0.9
             }
@@ -173,8 +170,8 @@ struct SettingsView: View {
 
     private var datenquelleSection: some View {
         Section("Datenquelle") {
-            LabeledContent("Station", value: "Puerto de la Luz (Gran Canaria)")
-            LabeledContent("Stations-ID", value: "56")
+            LabeledContent("Stationen", value: "Arinaga (40%) + Pasito Blanco (60%)")
+            LabeledContent("IHM IDs", value: "57 + 58")
             LabeledContent("Quelle", value: "Instituto Hidrográfico de la Marina")
             if let date = viewModel.lastUpdated {
                 LabeledContent("Zuletzt geladen") {
@@ -224,6 +221,41 @@ struct SettingsView: View {
             Text("Verlauf")
         } footer: {
             Text("Anzahl der Tage die beim Öffnen des Verlauf-Tabs angezeigt werden (2–14).")
+        }
+    }
+
+    // MARK: - Referenzpunkt
+
+    private var referenzpunktSection: some View {
+        Section {
+            HStack {
+                Text("Referenzverschiebung")
+                Spacer()
+                Text(viewModel.tideReferenceOffsetCm == 0
+                     ? "Seekartennull (0 cm)"
+                     : "−\(viewModel.tideReferenceOffsetCm) cm")
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            Stepper(
+                value: Binding(
+                    get: { viewModel.tideReferenceOffsetCm },
+                    set: { viewModel.tideReferenceOffsetCm = $0 }
+                ),
+                in: 0...200, step: 1
+            ) { EmptyView() }
+            Button("Mittelwasser Gran Canaria (−120 cm)") {
+                viewModel.tideReferenceOffsetCm = 120
+            }
+            .foregroundStyle(.blue)
+            Button("Seekartennull (0 cm)") {
+                viewModel.tideReferenceOffsetCm = 0
+            }
+            .foregroundStyle(.secondary)
+        } header: {
+            Text("Höhen-Referenzpunkt")
+        } footer: {
+            Text("Verschiebt den Nullpunkt der angezeigten Gezeitenhöhen. 0 = Seekartennull (alle Werte positiv). ~120 cm = Mittelwasser (Ebbe negativ, Flut positiv). Gilt nur für die Anzeige, nicht für die Strandgang-Schwellwerte.")
         }
     }
 
