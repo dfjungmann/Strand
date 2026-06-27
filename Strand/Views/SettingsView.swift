@@ -7,16 +7,44 @@ struct SettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
+            benachrichtigungenSection
+            strandgangSection
+            verlaufSection
             zeitkorrekturSection
             schriftSection
-            strandgangSection
-                datenquelleSection
-                verlaufSection
-                radarSection
-                kiSection
+            datenquelleSection
+            radarSection
+            kiSection
             }
             .navigationTitle("Einstellungen")
             .navigationBarTitleDisplayMode(.large)
+        }
+    }
+
+    // MARK: - Benachrichtigungen
+
+    @AppStorage("notif_enabled") private var notifEnabled = false
+
+    private var benachrichtigungenSection: some View {
+        Section {
+            HStack {
+                Image(systemName: notifEnabled ? "bell.fill" : "bell.slash")
+                    .foregroundStyle(notifEnabled ? .blue : .secondary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Benachrichtigungen")
+                        .font(.subheadline)
+                    Text(notifEnabled ? "Aktiv" : "Deaktiviert")
+                        .font(.caption)
+                        .foregroundStyle(notifEnabled ? .green : .secondary)
+                }
+            }
+            NavigationLink("Benachrichtigungen konfigurieren") {
+                NotificationsSettingsView(viewModel: viewModel)
+            }
+        } header: {
+            Text("Benachrichtigungen")
+        } footer: {
+            Text("Gezeiten-Erinnerungen und Strandgang-Warnungen.")
         }
     }
 

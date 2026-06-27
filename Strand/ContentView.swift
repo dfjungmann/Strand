@@ -22,9 +22,14 @@ struct ContentView: View {
                 .tabItem { Label("Wetter", systemImage: "cloud.sun.fill") }
                 .tag(3)
 
+            // Radar-Tab: nur eingebunden wenn INCLUDE_RADAR Compiler-Flag gesetzt ist.
+            // Aktivieren: Xcode → Build Settings → Swift Compiler - Custom Flags →
+            //   Other Swift Flags → "-DINCLUDE_RADAR" hinzufügen
+            #if INCLUDE_RADAR
             WeatherMapView(selectedTab: $selectedTab)
                 .tabItem { Label("Radar", systemImage: "dot.radiowaves.left.and.right") }
                 .tag(4)
+            #endif
 
             SettingsView(viewModel: viewModel)
                 .tabItem { Label("Einstellungen", systemImage: "gearshape") }

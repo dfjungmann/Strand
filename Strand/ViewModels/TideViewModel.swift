@@ -97,6 +97,9 @@ final class TideViewModel {
         }
         lastUpdated = Date()
         isLoading = false
+        Task { @MainActor in
+            await NotificationManager.shared.reschedule(viewModel: self)
+        }
     }
 
     @MainActor

@@ -465,12 +465,19 @@ struct VerlaufView: View {
             .foregroundStyle(Color.blue)
     }
 
-    private func chartCard<Content: View>(title: String, @ViewBuilder content: () -> Content) -> some View {
+    private func chartCard<Content: View>(title: String, tapHint: Bool = false, @ViewBuilder content: () -> Content) -> some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(title)
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 4)
+            HStack(spacing: 5) {
+                Text(title)
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                if tapHint {
+                    Image(systemName: "hand.tap")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .padding(.horizontal, 4)
             content()
         }
         .padding(14)
@@ -1040,7 +1047,7 @@ struct VerlaufView: View {
         default: rawData = dailyPrecipSum;          title = "Niederschlag"
         }
         let maxVal = max((rawData.map(\.total).max() ?? 5) * 1.2, 0.1)
-        return chartCard(title: title) {
+        return chartCard(title: title, tapHint: true) {
             Chart {
                 ForEach(rawData, id: \.date) { d in
                     // unit: .day → bar spans full calendar day, auto-grounded at 0
@@ -1116,7 +1123,7 @@ struct VerlaufView: View {
                                           end:   $0.date.addingTimeInterval(6 * 3600),
                                           total: $0.total) }
         let maxVal = max((raw.map(\.total).max() ?? 5) * 1.2, 0.1)
-        return chartCard(title: title) {
+        return chartCard(title: title, tapHint: true) {
             sixHourChart(bars: bars, maxVal: maxVal)
                 .contentShape(Rectangle())
                 .onTapGesture { precipMode = (precipMode + 1) % 3 }
