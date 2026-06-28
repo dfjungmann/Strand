@@ -5,9 +5,10 @@ struct TableView: View {
     @Binding var selectedTab: Int
 
     @State private var selectedDay: TideDay?
-    @AppStorage("showAstronomy") private var showAstronomy = true
-    @AppStorage("showWeather")   private var showWeather   = true
-    @AppStorage("showWaves")     private var showWaves     = true
+    @AppStorage("showAstronomy")    private var showAstronomy  = true
+    @AppStorage("showWeather")      private var showWeather    = true
+    @AppStorage("showWaves")        private var showWaves      = true
+    @AppStorage("table_show_wind")  private var showWind       = false
     // Read font size once at TableView level so only one view re-renders when
     // it changes, rather than all 10 CompactDayRow instances simultaneously.
     // Simultaneous height changes in a List can accidentally trigger the
@@ -80,6 +81,7 @@ struct TableView: View {
                               showAstronomy: showAstronomy,
                               showWeather: showWeather,
                               showWaves: showWaves,
+                              showWind: showWind,
                               fontSize: tableFontSize,
                               isAlternate: index % 2 == 1)
                     .listRowInsets(EdgeInsets(top: 6, leading: 16, bottom: 6, trailing: 16))
@@ -138,6 +140,7 @@ struct CompactDayRow: View {
     var showAstronomy: Bool = true
     var showWeather: Bool   = true
     var showWaves: Bool     = true
+    var showWind: Bool      = false
     var fontSize: Double    = 14.0
     var isAlternate: Bool   = false
 
@@ -282,6 +285,21 @@ struct CompactDayRow: View {
                             }
                         }
                         .frame(maxWidth: .infinity)
+                    }
+                }
+                .padding(.horizontal, 4)
+            }
+
+            // ── Windstärke (Tages-Maximum) ──
+            if showWind, let maxWind = viewModel.maxWindSpeed(for: day.date) {
+                HStack {
+                    Spacer()
+                    HStack(spacing: 3) {
+                        Text("💨")
+                            .font(.system(size: fontSize * 0.65))
+                        Text(String(format: "Max. %.0f km/h", maxWind))
+                            .font(.system(size: fontSize * 0.9).monospacedDigit())
+                            .foregroundStyle(.secondary)
                     }
                 }
                 .padding(.horizontal, 4)

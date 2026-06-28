@@ -12,6 +12,7 @@ struct SettingsView: View {
             verlaufSection
             zeitkorrekturSection
             schriftSection
+            tabelleAnzeigeSection
             datenquelleSection
             referenzpunktSection
             radarSection
@@ -83,7 +84,8 @@ struct SettingsView: View {
         }
     }
 
-    @AppStorage("tableFontSize") private var tableFontSize = 14.0
+    @AppStorage("tableFontSize")     private var tableFontSize     = 14.0
+    @AppStorage("table_show_wind")   private var tableShowWind     = false
     @AppStorage("verlauf_default_days") private var verlaufDefaultDays: Int = 5
 
     // MARK: - Tabelle Schrift
@@ -110,6 +112,18 @@ struct SettingsView: View {
             Text("Tabelle – Schriftgröße")
         } footer: {
             Text("Schriftgröße der Zeiten und Höhen in der Gezeitentabelle.")
+        }
+    }
+
+    // MARK: - Tabelle Anzeige
+
+    private var tabelleAnzeigeSection: some View {
+        Section {
+            Toggle("Windstärke anzeigen", isOn: $tableShowWind)
+        } header: {
+            Text("Tabelle – Anzeige")
+        } footer: {
+            Text("Zeigt die maximale Windgeschwindigkeit des Tages in der Gezeitentabelle an (in km/h).")
         }
     }
 

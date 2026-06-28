@@ -184,6 +184,20 @@ final class TideViewModel {
         })?.waveHeight
     }
 
+    /// Maximum wind speed (km/h) for the calendar day of `date`
+    func maxWindSpeed(for date: Date) -> Double? {
+        let canary = TideService.canaryIslandsTimeZone
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = canary
+        let startOfDay = cal.startOfDay(for: date)
+        let endOfDay   = cal.date(byAdding: .day, value: 1, to: startOfDay)!
+        let speeds = hourlyWeather
+            .filter { $0.time >= startOfDay && $0.time < endOfDay }
+            .map(\.windSpeed)
+        guard !speeds.isEmpty else { return nil }
+        return speeds.max()
+    }
+
     /// Mean water temperature for the calendar day of `date`
     func meanWaterTemp(for date: Date) -> Double? {
         let canary = TideService.canaryIslandsTimeZone
