@@ -177,6 +177,22 @@ struct SettingsView: View {
                 in: -1.50...1.50, step: 0.01
             ) { EmptyView() }
 
+            // Dunkelgrün-Grenze
+            HStack {
+                Circle().fill(Color(hue: 0.333, saturation: 0.85, brightness: 0.55)).frame(width: 10, height: 10)
+                Text("Dunkelgrün ab")
+                Spacer()
+                Text(String(format: "%.0f cm darunter", Double(viewModel.beachWalkDeepCm)))
+                    .foregroundStyle(.secondary).monospacedDigit()
+            }
+            Stepper(
+                value: Binding(
+                    get: { viewModel.beachWalkDeepCm },
+                    set: { viewModel.beachWalkDeepCm = max(1, $0) }
+                ),
+                in: 0...20, step: 1
+            ) { EmptyView() }
+
             Button("Standard zurücksetzen (−65 cm / −55 cm bei 120 cm Offset)") {
                 // Rohwerte 0.55 / 0.65 m entsprechen mit 120 cm Offset: −65 cm / −55 cm
                 viewModel.beachWalkThresholdSafe   = 0.55

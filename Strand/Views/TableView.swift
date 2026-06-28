@@ -213,44 +213,38 @@ struct CompactDayRow: View {
                 .background(Color.accentColor.opacity(0.08))
                 .clipShape(Capsule())
                 Spacer()
-                // Wassertemperatur (Tagesmittel) neben dem Titel
+                // Max. Tagestemperatur
+                if let maxTemp = viewModel.weather(for: day.date)?.maxTemp {
+                    HStack(spacing: 2) {
+                        Image(systemName: "thermometer.high").foregroundStyle(.red)
+                        Text(String(format: "%.0f°", maxTemp)).foregroundStyle(.primary)
+                    }
+                    .font(.caption)
+                }
+                // Wassertemperatur (Tagesmittel)
                 if let waterTemp = viewModel.meanWaterTemp(for: day.date) {
-                    HStack(spacing: 3) {
+                    HStack(spacing: 2) {
                         Image(systemName: "thermometer.medium").foregroundStyle(.teal)
                         Text(String(format: "%.1f°", waterTemp)).foregroundStyle(.teal)
                     }
                     .font(.caption)
                 }
-                if let beachColor = bestBeachWalkColor {
-                    HStack(spacing: 3) {
-                        Image(systemName: "beach.umbrella")
-                        Text("Strandgang")
-                    }
-                    .font(.caption2)
-                    .padding(.horizontal, 7)
-                    .padding(.vertical, 3)
-                    .background(beachColor.opacity(0.2))
-                    .foregroundStyle(beachColor)
-                    .clipShape(Capsule())
+                // Mondphase
+                HStack(spacing: 3) {
+                    Text(astronomy.moonPhase.emoji)
+                    Text(astronomy.moonPhase.rawValue).foregroundStyle(.secondary)
                 }
+                .font(.caption)
             }
 
             // ── Spalten: Zeit + Höhe übereinander, Strandgang farbig ──
             HStack(spacing: 4) {
                 ForEach(day.events) { event in
-                    let isHigh    = event.type == .highTide
+                    let isHigh = event.type == .highTide
                     let tideColor: Color = isHigh ? .blue : .orange
-                    // High tide: 2 steps smaller (factor 0.82 ≈ two typography steps)
                     let scale: CGFloat   = isHigh ? 0.82 : 1.0
-                    let bgColor: Color = {
-                        switch event.beachWalkStatus {
-                        case .safe:   return .green
-                        case .likely: return .yellow
-                        case .none:   return .clear
-                        }
-                    }()
-                    let onBg = event.beachWalkStatus != .none
-                    let textOnBg: Color = event.beachWalkStatus == .likely ? .black : .white
+                    let (bgColor, textOnBg) = beachWalkGradientColors(rawHeight: event.height)
+                    let onBg = bgColor != .clear
 
                     VStack(spacing: 2) {
                         HStack(spacing: 3) {
@@ -343,10 +337,6 @@ struct CompactDayRow: View {
                         }
                     }
                     Spacer()
-                    HStack(spacing: 4) {
-                        Text(astronomy.moonPhase.emoji)
-                        Text(astronomy.moonPhase.rawValue).foregroundStyle(.secondary)
-                    }
                 }
                 .font(.caption)
             }
@@ -388,5 +378,50 @@ struct CompactDayRow: View {
         }
         .padding(.vertical, 2)
         .background(isAlternate ? Color.primary.opacity(0.04) : Color.clear)
+    }
+
+    // MARK: - Gradient beach walk color
+
+    /// Returns (background, textColor) for a tide event based on its raw height
+    /// relative to the beach walk thresholds. Creates a continuous gradient:
+    /// 5 cm above "likely" → faint yellow → yellow → yellow-green → green → deep green
+    private func beachWalkGradientColors(rawHeight: Double) -> (Color, Color) {
+        let safe   = viewModel.beachWalkThresholdSafe
+        let likely = viewModel.beachWalkThresholdLikely
+        if rawHeight > likely {
+            return (.clear, .primary)
+        }
+
+        if rawHeight > safe {
+            // Yellow → yellow-green gradient
+            let range = max(likely - safe, 0.001)
+            let t = (rawHeight - safe) / range   // 1 at likely, 0 at safe
+            // Hue: 0.167 = yellow, 0.333 = green
+            let hue        = 0.167 + (1.0 - t) * (0.333 - 0.167)
+            let saturation = 0.55 + (1.0 - t) * 0.20   // more saturated toward green
+            let brightness = 0.92
+            return (Color(hue: hue, saturation: saturation, brightness: brightness), .black)
+        }
+
+        // Safe zone — two sub-zones:
+        // 1. safe … safe-deepCm : light → medium green
+        // 2. below safe-deepCm  : medium → deep green (extra dark zone)
+        let deepThreshold = safe - Double(viewModel.beachWalkDeepCm) / 100.0
+
+        if rawHeight > deepThreshold {
+            // Zone 1: safe → deepThreshold — hellgrün, schwarze Schrift
+            let range = max(safe - deepThreshold, 0.001)
+            let t = (safe - rawHeight) / range          // 0 at safe, 1 at deepThreshold
+            let saturation = 0.38 + t * 0.27            // 0.38 → 0.65
+            let brightness = 0.90 - t * 0.05            // 0.90 → 0.85
+            return (Color(hue: 0.333, saturation: saturation, brightness: brightness), .black)
+        } else {
+            // Zone 2: unterhalb deepThreshold — kräftiges Dunkelgrün, weiße Schrift
+            let depth = min(deepThreshold - rawHeight, 0.20)
+            let t = depth / 0.20                        // 0 at deepThreshold, 1 at -20cm below
+            let saturation = 0.80 + t * 0.15            // 0.80 → 0.95
+            let brightness = 0.52 - t * 0.12            // 0.52 → 0.40
+            return (Color(hue: 0.333, saturation: saturation, brightness: brightness), .white)
+        }
     }
 }

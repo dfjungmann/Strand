@@ -33,6 +33,10 @@ final class TideViewModel {
     var beachWalkThresholdLikely: Double {
         didSet { UserDefaults.standard.set(beachWalkThresholdLikely, forKey: "beachWalkThresholdLikely") }
     }
+    /// Cm unterhalb der Sicher-Grenze, ab der dunkleres Grün beginnt
+    var beachWalkDeepCm: Int {
+        didSet { UserDefaults.standard.set(beachWalkDeepCm, forKey: "beachWalkDeepCm") }
+    }
     /// Offset in cm subtrahiert von Rohwert (SKN) für die Anzeige; 0 = Seekartennull, ~120 = Mittelwasser
     var tideReferenceOffsetCm: Int {
         didSet { UserDefaults.standard.set(tideReferenceOffsetCm, forKey: "tide_reference_offset_cm") }
@@ -66,6 +70,9 @@ final class TideViewModel {
 
         let storedLikely = UserDefaults.standard.object(forKey: "beachWalkThresholdLikely") as? Double
         beachWalkThresholdLikely = storedLikely ?? 0.65
+
+        let storedDeep = UserDefaults.standard.object(forKey: "beachWalkDeepCm") as? Int
+        beachWalkDeepCm = storedDeep ?? 7
 
         let storedRefOffset = UserDefaults.standard.object(forKey: "tide_reference_offset_cm") as? Int
         tideReferenceOffsetCm = storedRefOffset ?? 0

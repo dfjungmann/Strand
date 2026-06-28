@@ -146,27 +146,19 @@ struct NotificationsSettingsView: View {
             HStack {
                 Text("Erlaubt von")
                 Spacer()
-                Stepper("\(windowStart):00", value: $windowStart, in: 0...(windowEnd - 1))
-                    .labelsHidden()
-                Text("\(windowStart):00")
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-                    .frame(width: 44, alignment: .trailing)
+                Stepper(String(format: "%02d:00", windowStart), value: $windowStart, in: 0...(windowEnd - 1))
+                    .fixedSize()
             }
             HStack {
                 Text("Erlaubt bis")
                 Spacer()
-                Stepper("\(windowEnd):00", value: $windowEnd, in: (windowStart + 1)...23)
-                    .labelsHidden()
-                Text("\(windowEnd):00")
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-                    .frame(width: 44, alignment: .trailing)
+                Stepper(String(format: "%02d:00", windowEnd), value: $windowEnd, in: (windowStart + 1)...23)
+                    .fixedSize()
             }
         } header: {
             Text("Zeitfenster")
         } footer: {
-            Text("Benachrichtigungen nur zwischen \(windowStart):00 und \(windowEnd):00 Uhr senden.")
+            Text(String(format: "Benachrichtigungen nur zwischen %02d:00 und %02d:00 Uhr senden.", windowStart, windowEnd))
         }
     }
 
@@ -175,27 +167,19 @@ struct NotificationsSettingsView: View {
             HStack {
                 Text("Strandgang ab")
                 Spacer()
-                Stepper("\(contentStart):00", value: $contentStart, in: 0...(contentEnd - 1))
-                    .labelsHidden()
-                Text("\(contentStart):00")
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-                    .frame(width: 44, alignment: .trailing)
+                Stepper(String(format: "%02d:00", contentStart), value: $contentStart, in: 0...(contentEnd - 1))
+                    .fixedSize()
             }
             HStack {
                 Text("Strandgang bis")
                 Spacer()
-                Stepper("\(contentEnd):00", value: $contentEnd, in: (contentStart + 1)...23)
-                    .labelsHidden()
-                Text("\(contentEnd):00")
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-                    .frame(width: 44, alignment: .trailing)
+                Stepper(String(format: "%02d:00", contentEnd), value: $contentEnd, in: (contentStart + 1)...23)
+                    .fixedSize()
             }
         } header: {
             Text("Strandgang-Fenster")
         } footer: {
-            Text("Nur Strandspaziergänge zwischen \(contentStart):00 und \(contentEnd):00 Uhr werden in der Meldung erwähnt. Tiefstände außerhalb werden mit ⚠️ markiert.")
+            Text(String(format: "Nur Strandspaziergänge zwischen %02d:00 und %02d:00 Uhr werden in der Meldung erwähnt. Tiefstände außerhalb werden mit 🌙 markiert.", contentStart, contentEnd))
         }
     }
 
