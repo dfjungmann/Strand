@@ -243,7 +243,7 @@ struct CompactDayRow: View {
                     let isHigh = event.type == .highTide
                     let tideColor: Color = isHigh ? .blue : .orange
                     let scale: CGFloat   = isHigh ? 0.82 : 1.0
-                    let (bgColor, textOnBg) = beachWalkGradientColors(rawHeight: event.height)
+                    let (bgColor, textOnBg) = viewModel.beachWalkGradientColors(rawHeight: event.height)
                     let onBg = bgColor != .clear
 
                     VStack(spacing: 2) {
@@ -378,50 +378,5 @@ struct CompactDayRow: View {
         }
         .padding(.vertical, 2)
         .background(isAlternate ? Color.primary.opacity(0.04) : Color.clear)
-    }
-
-    // MARK: - Gradient beach walk color
-
-    /// Returns (background, textColor) for a tide event based on its raw height
-    /// relative to the beach walk thresholds. Creates a continuous gradient:
-    /// 5 cm above "likely" → faint yellow → yellow → yellow-green → green → deep green
-    private func beachWalkGradientColors(rawHeight: Double) -> (Color, Color) {
-        let safe   = viewModel.beachWalkThresholdSafe
-        let likely = viewModel.beachWalkThresholdLikely
-        if rawHeight > likely {
-            return (.clear, .primary)
-        }
-
-        if rawHeight > safe {
-            // Yellow → yellow-green gradient
-            let range = max(likely - safe, 0.001)
-            let t = (rawHeight - safe) / range   // 1 at likely, 0 at safe
-            // Hue: 0.167 = yellow, 0.333 = green
-            let hue        = 0.167 + (1.0 - t) * (0.333 - 0.167)
-            let saturation = 0.55 + (1.0 - t) * 0.20   // more saturated toward green
-            let brightness = 0.92
-            return (Color(hue: hue, saturation: saturation, brightness: brightness), .black)
-        }
-
-        // Safe zone — two sub-zones:
-        // 1. safe … safe-deepCm : light → medium green
-        // 2. below safe-deepCm  : medium → deep green (extra dark zone)
-        let deepThreshold = safe - Double(viewModel.beachWalkDeepCm) / 100.0
-
-        if rawHeight > deepThreshold {
-            // Zone 1: safe → deepThreshold — hellgrün, schwarze Schrift
-            let range = max(safe - deepThreshold, 0.001)
-            let t = (safe - rawHeight) / range          // 0 at safe, 1 at deepThreshold
-            let saturation = 0.38 + t * 0.27            // 0.38 → 0.65
-            let brightness = 0.90 - t * 0.05            // 0.90 → 0.85
-            return (Color(hue: 0.333, saturation: saturation, brightness: brightness), .black)
-        } else {
-            // Zone 2: unterhalb deepThreshold — kräftiges Dunkelgrün, weiße Schrift
-            let depth = min(deepThreshold - rawHeight, 0.20)
-            let t = depth / 0.20                        // 0 at deepThreshold, 1 at -20cm below
-            let saturation = 0.80 + t * 0.15            // 0.80 → 0.95
-            let brightness = 0.52 - t * 0.12            // 0.52 → 0.40
-            return (Color(hue: 0.333, saturation: saturation, brightness: brightness), .white)
-        }
     }
 }

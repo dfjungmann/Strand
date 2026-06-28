@@ -117,7 +117,7 @@ struct TideClockView: View {
                 GeometryReader { geo in
                     let w  = geo.size.width
                     let h  = geo.size.height
-                    let r  = min(w, h) * 0.40
+                    let r  = min(w, h) * 0.44
                     let cx = w / 2
                     let cy = h / 2
 
@@ -127,7 +127,6 @@ struct TideClockView: View {
                         tideMarkerViews(cx: cx, cy: cy, r: r)
                         centerReadout(cx: cx, cy: cy, r: r)
                         outerTideLabels(cx: cx, cy: cy, r: r)
-                        sideLabels(cx: cx, cy: cy, r: r)
                     }
                 }
             }
@@ -152,13 +151,12 @@ struct TideClockView: View {
             fillRing(ctx, cx, cy, r * 0.87, r,        Color(white: 0.74))
             fillRing(ctx, cx, cy, r * 0.81, r * 0.87, Color(red: 0.88, green: 0.72, blue: 0.22))
             fillRing(ctx, cx, cy, r * 0.76, r * 0.81, Color(white: 0.68))
-            fillRing(ctx, cx, cy, r * 0.56, r * 0.76, Color(red: 0.93, green: 0.96, blue: 0.99))
+            fillRing(ctx, cx, cy, r * 0.65, r * 0.76, Color(red: 0.93, green: 0.96, blue: 0.99))
 
-            // Beach walk arc (green) centred on low tide position (180°), if qualifying
+            // Strandy-Bogen (Farbverlauf wie Tab Tabelle) um Niedrigwasser-Position (180°)
             if let lt = cycleLowTide, lt.beachWalkStatus != .none {
-                let arcColor: Color = lt.beachWalkStatus == .safe
-                    ? Color.green.opacity(0.35)
-                    : Color.yellow.opacity(0.30)
+                let arcColor = viewModel.beachWalkGradientColors(rawHeight: lt.height).background
+                    .opacity(0.75)
                 let span = beachWalkArcSpan
                 let startDeg = 180.0 - span - 90.0   // convert to standard angle (0=right)
                 let endDeg   = 180.0 + span - 90.0
@@ -190,20 +188,12 @@ struct TideClockView: View {
                            lineWidth: lw)
             }
 
-            // Inner ocean sphere
-            let innerR = r * 0.54
+            // Innerer Bereich — helles Zifferblatt (kein Blau)
+            let innerR = r * 0.64
             ctx.fill(
                 Path(ellipseIn: CGRect(x: cx - innerR, y: cy - innerR,
                                        width: innerR * 2, height: innerR * 2)),
-                with: .radialGradient(
-                    Gradient(stops: [
-                        .init(color: Color(red: 0.25, green: 0.58, blue: 0.88), location: 0.0),
-                        .init(color: Color(red: 0.06, green: 0.25, blue: 0.60), location: 1.0),
-                    ]),
-                    center: CGPoint(x: cx, y: cy),
-                    startRadius: 0,
-                    endRadius: innerR
-                )
+                with: .color(Color(red: 0.97, green: 0.98, blue: 1.0))
             )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -305,34 +295,50 @@ struct TideClockView: View {
 
     @ViewBuilder
     private func centerReadout(cx: CGFloat, cy: CGFloat, r: CGFloat) -> some View {
-        let fSize = r * 0.30
+        let innerR = r * 0.64
+        let fSize  = innerR * 0.36
+        let padH   = r * 0.045
+        let padV   = r * 0.028
+        let corner = r * 0.045
+        let maxW   = innerR * 1.75
+        let heightBlue = Color(red: 0.08, green: 0.32, blue: 0.72)
+        let countdownBg = Color(white: 0.38)
 
-        VStack(spacing: r * 0.055) {
-            // HH:MM :ss
-            HStack(alignment: .firstTextBaseline, spacing: 1) {
+        VStack(spacing: r * 0.032) {
+            // HH:MM :ss — Flip-Uhr-Stil (monospaced black), schwarz, ohne Hintergrund
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text(hm(now))
-                    .font(.system(size: fSize, weight: .thin, design: .rounded))
-                    .foregroundStyle(.white)
+                    .font(.system(size: fSize * 1.08, weight: .black, design: .monospaced))
+                    .monospacedDigit()
+                    .foregroundStyle(.black)
                 Text(":\(ss(now))")
-                    .font(.system(size: fSize * 0.55, weight: .thin, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.60))
+                    .font(.system(size: fSize * 0.58, weight: .bold, design: .monospaced))
+                    .monospacedDigit()
+                    .foregroundStyle(.black.opacity(0.50))
             }
 
-            // ▲/▼ height
-            HStack(spacing: 5) {
+            // ▲/▼ Gezeitenhöhe — blau, ohne Hintergrund
+            HStack(spacing: 4) {
                 Image(systemName: isRising ? "arrow.up" : "arrow.down")
-                    .font(.system(size: fSize * 0.38, weight: .bold))
-                    .foregroundStyle(.red)
-                Text(String(format: "%.2fm", currentHeight))
-                    .font(.system(size: fSize * 0.82, weight: .light, design: .rounded))
-                    .foregroundStyle(.white)
+                    .font(.system(size: fSize * 0.42, weight: .bold))
+                    .foregroundStyle(heightBlue)
+                Text(viewModel.displayHeightFormatted(currentHeight))
+                    .font(.system(size: fSize * 0.88, weight: .semibold, design: .monospaced))
+                    .monospacedDigit()
+                    .foregroundStyle(heightBlue)
             }
 
+            // Countdown zum nächsten Extrem — mittleres Grau
             Text("\(nextIsHigh ? "↑" : "↓")  \(countdownString)")
-                .font(.system(size: fSize * 0.42, weight: .medium, design: .rounded)
+                .font(.system(size: fSize * 0.46, weight: .medium, design: .monospaced)
                     .monospacedDigit())
-                .foregroundStyle(.white.opacity(0.75))
+                .foregroundStyle(.white.opacity(0.90))
+                .padding(.horizontal, padH * 0.9)
+                .padding(.vertical, padV * 0.9)
+                .background(countdownBg.opacity(0.88))
+                .clipShape(RoundedRectangle(cornerRadius: corner * 0.9))
         }
+        .frame(maxWidth: maxW)
         .position(x: cx, y: cy)
     }
 
@@ -340,7 +346,8 @@ struct TideClockView: View {
 
     @ViewBuilder
     private func outerTideLabels(cx: CGFloat, cy: CGFloat, r: CGFloat) -> some View {
-        let labelR = r * 1.24
+        let labelR = r * 1.22
+        let topOffset = r * 0.10
         let fSize  = r * 0.115
 
         ZStack {
@@ -350,7 +357,7 @@ struct TideClockView: View {
                     Text(hm(ht.adjustedTime))
                         .font(.system(size: fSize, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color(white: 0.08))
-                    Text(String(format: "%.2fm", ht.height))
+                    Text(viewModel.displayHeightFormatted(ht.height))
                         .font(.system(size: fSize, weight: .regular))
                         .foregroundStyle(Color(white: 0.18))
                     if let wt = waterTemp(near: ht) {
@@ -368,7 +375,7 @@ struct TideClockView: View {
                             .foregroundStyle(.orange)
                     }
                 }
-                .position(x: cx, y: cy - labelR)
+                .position(x: cx, y: cy - labelR - topOffset)
             }
 
             if let lt = cycleLowTide {
@@ -377,7 +384,7 @@ struct TideClockView: View {
                     Text(hm(lt.adjustedTime))
                         .font(.system(size: fSize, weight: .semibold, design: .rounded))
                         .foregroundStyle(Color(white: 0.08))
-                    Text(String(format: "%.2fm", lt.height))
+                    Text(viewModel.displayHeightFormatted(lt.height))
                         .font(.system(size: fSize, weight: .regular))
                         .foregroundStyle(Color(white: 0.18))
                     if let wt = waterTemp(near: lt) {
@@ -397,28 +404,6 @@ struct TideClockView: View {
                 }
                 .position(x: cx, y: cy + labelR)
             }
-        }
-    }
-
-    // MARK: - Side labels (Rising / Falling)
-
-    @ViewBuilder
-    private func sideLabels(cx: CGFloat, cy: CGFloat, r: CGFloat) -> some View {
-        let sideX = r * 1.10
-        let fSize = r * 0.072
-
-        ZStack {
-            Text("Rising ▶")
-                .font(.system(size: fSize, weight: .light))
-                .foregroundStyle(Color(white: 0.10).opacity(0.50))
-                .rotationEffect(.degrees(-90))
-                .position(x: cx - sideX, y: cy)
-
-            Text("◀ Falling")
-                .font(.system(size: fSize, weight: .light))
-                .foregroundStyle(Color(white: 0.10).opacity(0.50))
-                .rotationEffect(.degrees(90))
-                .position(x: cx + sideX, y: cy)
         }
     }
 }

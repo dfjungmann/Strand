@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import SwiftUI
 
 @Observable
 final class TideViewModel {
@@ -276,6 +277,40 @@ final class TideViewModel {
 
     func displayHeightFormatted(_ rawHeight: Double) -> String {
         String(format: "%.2f m", displayHeight(rawHeight))
+    }
+
+    /// Hintergrund- und Textfarbe für Strandy-Anzeige (kontinuierlicher Verlauf nach Rohhöhe).
+    func beachWalkGradientColors(rawHeight: Double) -> (background: Color, text: Color) {
+        let safe   = beachWalkThresholdSafe
+        let likely = beachWalkThresholdLikely
+        if rawHeight > likely {
+            return (.clear, .primary)
+        }
+
+        if rawHeight > safe {
+            let range = max(likely - safe, 0.001)
+            let t = (rawHeight - safe) / range
+            let hue        = 0.167 + (1.0 - t) * (0.333 - 0.167)
+            let saturation = 0.55 + (1.0 - t) * 0.20
+            let brightness = 0.92
+            return (Color(hue: hue, saturation: saturation, brightness: brightness), .black)
+        }
+
+        let deepThreshold = safe - Double(beachWalkDeepCm) / 100.0
+
+        if rawHeight > deepThreshold {
+            let range = max(safe - deepThreshold, 0.001)
+            let t = (safe - rawHeight) / range
+            let saturation = 0.38 + t * 0.27
+            let brightness = 0.90 - t * 0.05
+            return (Color(hue: 0.333, saturation: saturation, brightness: brightness), .black)
+        } else {
+            let depth = min(deepThreshold - rawHeight, 0.20)
+            let t = depth / 0.20
+            let saturation = 0.80 + t * 0.15
+            let brightness = 0.52 - t * 0.12
+            return (Color(hue: 0.333, saturation: saturation, brightness: brightness), .white)
+        }
     }
 
     // MARK: - Formatting
