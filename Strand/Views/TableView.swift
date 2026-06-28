@@ -56,6 +56,12 @@ struct TableView: View {
                             Image(systemName: showWaves ? "water.waves" : "water.waves.slash")
                                 .foregroundStyle(showWaves ? .teal : .secondary)
                         }
+                        Button {
+                            showWind.toggle()
+                        } label: {
+                            Image(systemName: showWind ? "wind" : "wind")
+                                .foregroundStyle(showWind ? .blue : .secondary)
+                        }
                     }
                 }
             }
@@ -290,16 +296,32 @@ struct CompactDayRow: View {
                 .padding(.horizontal, 4)
             }
 
-            // ── Windstärke (Tages-Maximum) ──
-            if showWind, let maxWind = viewModel.maxWindSpeed(for: day.date) {
-                HStack {
-                    Spacer()
-                    HStack(spacing: 3) {
-                        Text("💨")
-                            .font(.system(size: fontSize * 0.65))
-                        Text(String(format: "Max. %.0f km/h", maxWind))
-                            .font(.system(size: fontSize * 0.9).monospacedDigit())
-                            .foregroundStyle(.secondary)
+            // ── Windstärke: Maximum pro Tages-Viertel (0–6h / 6–12h / 12–18h / 18–24h) ──
+            if showWind && !viewModel.hourlyWeather.isEmpty {
+                let quarters = viewModel.maxWindSpeedPerQuarter(for: day.date)
+                let labels = ["0–6h", "6–12h", "12–18h", "18–24h"]
+                HStack(spacing: 4) {
+                    ForEach(0..<4, id: \.self) { q in
+                        VStack(spacing: 1) {
+                            Text(labels[q])
+                                .font(.system(size: fontSize * 0.65))
+                                .foregroundStyle(.secondary)
+                            HStack(spacing: 2) {
+                                Image(systemName: "wind")
+                                    .font(.system(size: fontSize * 0.65))
+                                    .foregroundStyle(.blue)
+                                if let ws = quarters[q] {
+                                    Text(String(format: "%.0f km/h", ws))
+                                        .font(.system(size: fontSize * 0.9).monospacedDigit())
+                                        .foregroundStyle(.blue)
+                                } else {
+                                    Text("—")
+                                        .font(.system(size: fontSize * 0.9))
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
                     }
                 }
                 .padding(.horizontal, 4)

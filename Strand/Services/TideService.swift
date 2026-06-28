@@ -113,8 +113,8 @@ actor TideService {
     // MARK: - Interpolation
 
     /// Merges tide events from Arinaga and Pasito Blanco using distance-weighted averaging.
-    /// Events are matched by type and ordinal position (1st high tide ↔ 1st high tide, etc.).
-    /// If one station has fewer events for a day, the available station's data is used as-is.
+    /// Events are matched by **time proximity** (same type, within 4 hours) to avoid
+    /// false pairings when the two stations have different event counts or ordering.
     nonisolated private func interpolateDay(
         arinaga: IHMMareas,
         pasitoBlanco: IHMMareas,
@@ -125,6 +125,9 @@ actor TideService {
         cal.timeZone = TideService.canaryIslandsTimeZone
 
         typealias RawEvent = (type: TideType, time: Date, height: Double)
+        let wA = Self.weightArinaga
+        let wP = Self.weightPasitoBlanco
+        let maxMatchWindow: TimeInterval = 4 * 3600  // two events must be within 4h to be paired
 
         func parseRaw(_ mareas: [IHMMarea]) -> [RawEvent] {
             mareas.compactMap { m in
@@ -137,43 +140,33 @@ actor TideService {
         }
 
         let aEvents = parseRaw(arinaga.datos.marea)
-        let pEvents = parseRaw(pasitoBlanco.datos.marea)
+        var pRemaining = parseRaw(pasitoBlanco.datos.marea)
 
-        let aHigh = aEvents.filter { $0.type == .highTide }
-        let aLow  = aEvents.filter { $0.type == .lowTide }
-        let pHigh = pEvents.filter { $0.type == .highTide }
-        let pLow  = pEvents.filter { $0.type == .lowTide }
-
-        func blend(_ a: RawEvent?, _ p: RawEvent?, type: TideType) -> TideEvent? {
-            let wA = Self.weightArinaga
-            let wP = Self.weightPasitoBlanco
-            let (origTime, height): (Date, Double)
-            switch (a, p) {
-            case let (.some(ae), .some(pe)):
-                let t = ae.time.timeIntervalSince1970 * wA + pe.time.timeIntervalSince1970 * wP
-                origTime = Date(timeIntervalSince1970: t)
-                height = ae.height * wA + pe.height * wP
-            case let (.some(ae), .none):
-                origTime = ae.time; height = ae.height
-            case let (.none, .some(pe)):
-                origTime = pe.time; height = pe.height
-            case (.none, .none):
-                return nil
-            }
+        func makeEvent(_ origTime: Date, _ height: Double, _ type: TideType) -> TideEvent {
             let adj = Calendar.current.date(byAdding: .minute, value: timeOffsetMinutes, to: origTime) ?? origTime
             return TideEvent(originalTime: origTime, adjustedTime: adj, height: height, type: type, date: referenceDate)
         }
 
         var events: [TideEvent] = []
-        for i in 0..<max(aHigh.count, pHigh.count) {
-            if let e = blend(i < aHigh.count ? aHigh[i] : nil,
-                             i < pHigh.count ? pHigh[i] : nil,
-                             type: .highTide) { events.append(e) }
+
+        // For each Arinaga event, find the nearest same-type Pasito Blanco event within the window
+        for ae in aEvents {
+            if let bestIdx = pRemaining.indices.filter({ pRemaining[$0].type == ae.type })
+                .min(by: { abs(pRemaining[$0].time.timeIntervalSince(ae.time)) < abs(pRemaining[$1].time.timeIntervalSince(ae.time)) }),
+               abs(pRemaining[bestIdx].time.timeIntervalSince(ae.time)) <= maxMatchWindow {
+                let pe = pRemaining.remove(at: bestIdx)
+                let t = ae.time.timeIntervalSince1970 * wA + pe.time.timeIntervalSince1970 * wP
+                let h = ae.height * wA + pe.height * wP
+                events.append(makeEvent(Date(timeIntervalSince1970: t), h, ae.type))
+            } else {
+                // No matching Pasito Blanco event → use Arinaga alone
+                events.append(makeEvent(ae.time, ae.height, ae.type))
+            }
         }
-        for i in 0..<max(aLow.count, pLow.count) {
-            if let e = blend(i < aLow.count ? aLow[i] : nil,
-                             i < pLow.count ? pLow[i] : nil,
-                             type: .lowTide) { events.append(e) }
+
+        // Any remaining Pasito Blanco events not paired → use alone
+        for pe in pRemaining {
+            events.append(makeEvent(pe.time, pe.height, pe.type))
         }
 
         return TideDay(date: referenceDate, events: events.sorted { $0.adjustedTime < $1.adjustedTime })
