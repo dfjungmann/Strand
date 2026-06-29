@@ -279,6 +279,11 @@ final class TideViewModel {
         String(format: "%.2f m", displayHeight(rawHeight))
     }
 
+    /// Höhenwert ohne Einheit (z. B. Uhr-Zeigeranzeige).
+    func displayHeightValueFormatted(_ rawHeight: Double) -> String {
+        String(format: "%.2f", displayHeight(rawHeight))
+    }
+
     /// Hintergrund- und Textfarbe für Strandy-Anzeige (kontinuierlicher Verlauf nach Rohhöhe).
     func beachWalkGradientColors(rawHeight: Double) -> (background: Color, text: Color) {
         let safe   = beachWalkThresholdSafe

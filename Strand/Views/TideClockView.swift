@@ -6,6 +6,12 @@ struct TideClockView: View {
     let viewModel: TideViewModel
     @Binding var selectedTab: Int
 
+    /// true = Tidenhöhe am Zeiger · false = Tidenhöhe in der Mitte (alter Stand)
+    private let showTideHeightOnNeedle = true
+
+    /// true = DSEG7 Flip-Schrift für Uhrzeit · false = System-Monospace
+    private let useFlipClockFont = true
+
     @State private var now = Date()
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
@@ -96,13 +102,21 @@ struct TideClockView: View {
 
     private var tz: TimeZone { TideService.canaryIslandsTimeZone }
 
-    private func hm(_ date: Date) -> String {
-        let f = DateFormatter(); f.dateFormat = "HH:mm"; f.timeZone = tz
+    private func hh(_ date: Date) -> String {
+        let f = DateFormatter(); f.dateFormat = "HH"; f.timeZone = tz
         return f.string(from: date)
     }
-    private func ss(_ date: Date) -> String {
-        let f = DateFormatter(); f.dateFormat = "ss"; f.timeZone = tz
+    private func mm(_ date: Date) -> String {
+        let f = DateFormatter(); f.dateFormat = "mm"; f.timeZone = tz
         return f.string(from: date)
+    }
+    private func hm(_ date: Date) -> String { "\(hh(date)):\(mm(date))" }
+
+    private func clockTimeFont(size: CGFloat) -> Font {
+        if useFlipClockFont {
+            return FlipClockFont.time(size: size)
+        }
+        return .system(size: size, weight: .black, design: .monospaced)
     }
 
     // MARK: - Body
@@ -124,6 +138,9 @@ struct TideClockView: View {
                     ZStack {
                         clockFaceCanvas(cx: cx, cy: cy, r: r)
                         needleCanvas(cx: cx, cy: cy, r: r)
+                        if showTideHeightOnNeedle {
+                            needleHeightLabel(cx: cx, cy: cy, r: r)
+                        }
                         tideMarkerViews(cx: cx, cy: cy, r: r)
                         centerReadout(cx: cx, cy: cy, r: r)
                         outerTideLabels(cx: cx, cy: cy, r: r)
@@ -220,17 +237,19 @@ struct TideClockView: View {
             let rad = (needleAngleDeg - 90.0) * .pi / 180.0
             let perp = rad + .pi / 2
 
-            // Thin line from centre to ~80% of inner sphere
-            let lineLen = r * 0.46
-            let tipLine = CGPoint(x: cx + lineLen * cos(rad), y: cy + lineLen * sin(rad))
-            var line = Path(); line.move(to: CGPoint(x: cx, y: cy)); line.addLine(to: tipLine)
-            ctx.stroke(line, with: .color(.red.opacity(0.80)), lineWidth: 2.0)
-
             // Rectangular tab at bezel position
             let tabCx = r * 0.66
-            let tabCenter = CGPoint(x: cx + tabCx * cos(rad), y: cy + tabCx * sin(rad))
             let hLen: CGFloat = r * 0.065
             let hWid: CGFloat = r * 0.028
+            let tabCenter = CGPoint(x: cx + tabCx * cos(rad), y: cy + tabCx * sin(rad))
+
+            // Dicker Zeigerstrahl von der Mitte bis zum inneren Rand des roten Blocks
+            let lineEnd = tabCx - hLen
+            let tipLine = CGPoint(x: cx + lineEnd * cos(rad), y: cy + lineEnd * sin(rad))
+            var line = Path(); line.move(to: CGPoint(x: cx, y: cy)); line.addLine(to: tipLine)
+            ctx.stroke(line, with: .color(.red.opacity(0.85)),
+                       style: StrokeStyle(lineWidth: max(4.0, r * 0.014), lineCap: .butt))
+
             let corners: [CGPoint] = [
                 CGPoint(x: tabCenter.x + hLen * cos(rad) + hWid * cos(perp),
                         y: tabCenter.y + hLen * sin(rad) + hWid * sin(perp)),
@@ -254,6 +273,35 @@ struct TideClockView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .allowsHitTesting(false)
+    }
+
+    /// Text rotation aligned with needle, but never upside-down (lower half flipped +180°).
+    private var tideHeightLabelRotation: Double {
+        let a = needleAngleDeg
+        return (a > 90 && a < 270) ? a + 180 : a
+    }
+
+    // MARK: - Needle height label (rotates with needle)
+
+    @ViewBuilder
+    private func needleHeightLabel(cx: CGFloat, cy: CGFloat, r: CGFloat) -> some View {
+        let heightBlue = Color(red: 0.08, green: 0.32, blue: 0.72)
+        let fSize = r * 0.175
+        let rad = (needleAngleDeg - 90.0) * .pi / 180.0
+        // Auf dem Zeigerstrahl, weiter außen auf dem Skalenring
+        let tabR = r * 0.84
+        let x = cx + tabR * cos(rad)
+        let y = cy + tabR * sin(rad)
+
+        Text(viewModel.displayHeightValueFormatted(currentHeight))
+            .font(.system(size: fSize, weight: .black, design: .monospaced))
+            .monospacedDigit()
+            .foregroundStyle(heightBlue)
+            .shadow(color: .white, radius: 2)
+            .shadow(color: .white.opacity(0.8), radius: 5)
+            .rotationEffect(.degrees(tideHeightLabelRotation))
+            .position(x: x, y: y)
+            .animation(.linear(duration: 1), value: needleAngleDeg)
     }
 
     // MARK: - Tide markers (triangles at top / bottom of bezel)
@@ -297,46 +345,44 @@ struct TideClockView: View {
     private func centerReadout(cx: CGFloat, cy: CGFloat, r: CGFloat) -> some View {
         let innerR = r * 0.64
         let fSize  = innerR * 0.36
-        let padH   = r * 0.045
-        let padV   = r * 0.028
-        let corner = r * 0.045
         let maxW   = innerR * 1.75
         let heightBlue = Color(red: 0.08, green: 0.32, blue: 0.72)
-        let countdownBg = Color(white: 0.38)
+        let countdownGray = Color(white: 0.38)
 
-        VStack(spacing: r * 0.032) {
-            // HH:MM :ss — Flip-Uhr-Stil (monospaced black), schwarz, ohne Hintergrund
+        VStack(spacing: r * 0.024) {
+            // HH : MM nebeneinander
             HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(hm(now))
-                    .font(.system(size: fSize * 1.08, weight: .black, design: .monospaced))
+                Text(hh(now))
+                    .font(clockTimeFont(size: fSize * 1.08))
                     .monospacedDigit()
-                    .foregroundStyle(.black)
-                Text(":\(ss(now))")
-                    .font(.system(size: fSize * 0.58, weight: .bold, design: .monospaced))
+                Text(":")
+                    .font(clockTimeFont(size: fSize * 1.08))
+                Text(mm(now))
+                    .font(clockTimeFont(size: fSize * 1.08))
                     .monospacedDigit()
-                    .foregroundStyle(.black.opacity(0.50))
+            }
+            .foregroundStyle(.black)
+            .fixedSize()
+
+            // ▼ Gezeitenhöhe — Mitte (nur wenn showTideHeightOnNeedle == false)
+            if !showTideHeightOnNeedle {
+                HStack(spacing: 4) {
+                    Image(systemName: isRising ? "arrow.up" : "arrow.down")
+                        .font(.system(size: fSize * 0.42, weight: .bold))
+                        .foregroundStyle(heightBlue)
+                    Text(viewModel.displayHeightFormatted(currentHeight))
+                        .font(.system(size: fSize * 0.88, weight: .semibold, design: .monospaced))
+                        .monospacedDigit()
+                        .foregroundStyle(heightBlue)
+                }
             }
 
-            // ▲/▼ Gezeitenhöhe — blau, ohne Hintergrund
-            HStack(spacing: 4) {
-                Image(systemName: isRising ? "arrow.up" : "arrow.down")
-                    .font(.system(size: fSize * 0.42, weight: .bold))
-                    .foregroundStyle(heightBlue)
-                Text(viewModel.displayHeightFormatted(currentHeight))
-                    .font(.system(size: fSize * 0.88, weight: .semibold, design: .monospaced))
-                    .monospacedDigit()
-                    .foregroundStyle(heightBlue)
-            }
-
-            // Countdown zum nächsten Extrem — mittleres Grau
+            // Countdown zum nächsten Extrem — grau, ohne Hintergrund, tiefer im Kreis
             Text("\(nextIsHigh ? "↑" : "↓")  \(countdownString)")
                 .font(.system(size: fSize * 0.46, weight: .medium, design: .monospaced)
                     .monospacedDigit())
-                .foregroundStyle(.white.opacity(0.90))
-                .padding(.horizontal, padH * 0.9)
-                .padding(.vertical, padV * 0.9)
-                .background(countdownBg.opacity(0.88))
-                .clipShape(RoundedRectangle(cornerRadius: corner * 0.9))
+                .foregroundStyle(countdownGray)
+                .offset(y: r * 0.055)
         }
         .frame(maxWidth: maxW)
         .position(x: cx, y: cy)
