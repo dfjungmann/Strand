@@ -36,6 +36,7 @@ struct ContentView: View {
                 .tag(5)
         }
         .task { await viewModel.loadTides() }
+        .onAppear { WatchSettingsSync.shared.pushFromPhone() }
     }
 }
 

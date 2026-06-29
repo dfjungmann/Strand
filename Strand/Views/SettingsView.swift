@@ -1,8 +1,14 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
     let viewModel: TideViewModel
     @State private var showReloadConfirm = false
+    @State private var showExportSheet = false
+    @State private var showImportPicker = false
+    @State private var exportDocument = BackupDocument(data: Data())
+    @State private var backupMessage: String?
+    @State private var showBackupAlert = false
 
     var body: some View {
         NavigationStack {
@@ -17,9 +23,33 @@ struct SettingsView: View {
             referenzpunktSection
             radarSection
             kiSection
+            backupSection
             }
             .navigationTitle("Einstellungen")
             .navigationBarTitleDisplayMode(.large)
+            .fileExporter(
+                isPresented: $showExportSheet,
+                document: exportDocument,
+                contentType: .json,
+                defaultFilename: "Strand-Einstellungen"
+            ) { result in
+                if case .failure(let error) = result {
+                    backupMessage = error.localizedDescription
+                    showBackupAlert = true
+                }
+            }
+            .fileImporter(
+                isPresented: $showImportPicker,
+                allowedContentTypes: [.json],
+                allowsMultipleSelection: false
+            ) { result in
+                importBackup(from: result)
+            }
+            .alert("Einstellungen", isPresented: $showBackupAlert) {
+                Button("OK", role: .cancel) {}
+            } message: {
+                Text(backupMessage ?? "")
+            }
         }
     }
 
@@ -352,6 +382,78 @@ struct SettingsView: View {
         } footer: {
             Text("OpenAI API-Schlüssel für KI-gestützte Strandprognosen. Zugangsdaten werden sicher im Keychain gespeichert.")
         }
+    }
+
+    // MARK: - Backup
+
+    private var backupSection: some View {
+        Section {
+            Button {
+                do {
+                    let data = try SettingsBackup.exportData()
+                    exportDocument = BackupDocument(data: data)
+                    showExportSheet = true
+                } catch {
+                    backupMessage = "Export fehlgeschlagen: \(error.localizedDescription)"
+                    showBackupAlert = true
+                }
+            } label: {
+                Label("Einstellungen exportieren", systemImage: "square.and.arrow.up")
+            }
+
+            Button {
+                showImportPicker = true
+            } label: {
+                Label("Einstellungen importieren", systemImage: "square.and.arrow.down")
+            }
+        } header: {
+            Text("Sicherung")
+        } footer: {
+            Text("Alle Einstellungen als JSON sichern oder nach einer Neuinstallation wiederherstellen. Der Gezeitencache wird nicht mitgesichert (lädt sich neu).")
+        }
+    }
+
+    private func importBackup(from result: Result<[URL], Error>) {
+        switch result {
+        case .failure(let error):
+            backupMessage = "Import fehlgeschlagen: \(error.localizedDescription)"
+            showBackupAlert = true
+        case .success(let urls):
+            guard let url = urls.first else { return }
+            guard url.startAccessingSecurityScopedResource() else {
+                backupMessage = "Kein Zugriff auf die Datei."
+                showBackupAlert = true
+                return
+            }
+            defer { url.stopAccessingSecurityScopedResource() }
+            do {
+                let data = try Data(contentsOf: url)
+                let count = try SettingsBackup.importData(data)
+                viewModel.reloadSettingsFromDefaults()
+                backupMessage = "\(count) Einstellungen wiederhergestellt."
+                showBackupAlert = true
+            } catch {
+                backupMessage = "Import fehlgeschlagen: \(error.localizedDescription)"
+                showBackupAlert = true
+            }
+        }
+    }
+}
+
+// MARK: - Backup Document
+
+private struct BackupDocument: FileDocument {
+    static var readableContentTypes: [UTType] { [.json] }
+    var data: Data
+
+    init(data: Data) { self.data = data }
+
+    init(configuration: ReadConfiguration) throws {
+        data = configuration.file.regularFileContents ?? Data()
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: data)
     }
 }
 

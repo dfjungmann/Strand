@@ -24,23 +24,48 @@ final class TideViewModel {
         didSet { UserDefaults.standard.set(chartStartOffset, forKey: "chartStartOffset") }
     }
     var timeOffsetMinutes: Int {
-        didSet { UserDefaults.standard.set(timeOffsetMinutes, forKey: "timeOffsetMinutes") }
+        didSet {
+            UserDefaults.standard.set(timeOffsetMinutes, forKey: TideSettingsKeys.timeOffsetMinutes)
+            #if os(iOS)
+            WatchSettingsSync.shared.pushFromPhone()
+            #endif
+        }
     }
     /// Sichere Grenze – Markierung grün
     var beachWalkThresholdSafe: Double {
-        didSet { UserDefaults.standard.set(beachWalkThresholdSafe, forKey: "beachWalkThresholdSafe") }
+        didSet {
+            UserDefaults.standard.set(beachWalkThresholdSafe, forKey: TideSettingsKeys.beachWalkThresholdSafe)
+            #if os(iOS)
+            WatchSettingsSync.shared.pushFromPhone()
+            #endif
+        }
     }
     /// Wahrscheinliche Grenze – Markierung gelb (muss >= safe sein)
     var beachWalkThresholdLikely: Double {
-        didSet { UserDefaults.standard.set(beachWalkThresholdLikely, forKey: "beachWalkThresholdLikely") }
+        didSet {
+            UserDefaults.standard.set(beachWalkThresholdLikely, forKey: TideSettingsKeys.beachWalkThresholdLikely)
+            #if os(iOS)
+            WatchSettingsSync.shared.pushFromPhone()
+            #endif
+        }
     }
     /// Cm unterhalb der Sicher-Grenze, ab der dunkleres Grün beginnt
     var beachWalkDeepCm: Int {
-        didSet { UserDefaults.standard.set(beachWalkDeepCm, forKey: "beachWalkDeepCm") }
+        didSet {
+            UserDefaults.standard.set(beachWalkDeepCm, forKey: TideSettingsKeys.beachWalkDeepCm)
+            #if os(iOS)
+            WatchSettingsSync.shared.pushFromPhone()
+            #endif
+        }
     }
     /// Offset in cm subtrahiert von Rohwert (SKN) für die Anzeige; 0 = Seekartennull, ~120 = Mittelwasser
     var tideReferenceOffsetCm: Int {
-        didSet { UserDefaults.standard.set(tideReferenceOffsetCm, forKey: "tide_reference_offset_cm") }
+        didSet {
+            UserDefaults.standard.set(tideReferenceOffsetCm, forKey: TideSettingsKeys.tideReferenceOffsetCm)
+            #if os(iOS)
+            WatchSettingsSync.shared.pushFromPhone()
+            #endif
+        }
     }
 
     // MARK: - State
@@ -77,6 +102,21 @@ final class TideViewModel {
 
         let storedRefOffset = UserDefaults.standard.object(forKey: "tide_reference_offset_cm") as? Int
         tideReferenceOffsetCm = storedRefOffset ?? 0
+    }
+
+    /// Nach Import eines Einstellungs-Backups ViewModel-Werte neu laden.
+    func reloadSettingsFromDefaults() {
+        let storedChart = UserDefaults.standard.integer(forKey: "chartDays")
+        chartDays = (1...7).contains(storedChart) ? storedChart : 3
+
+        let storedOffset = UserDefaults.standard.integer(forKey: "chartStartOffset")
+        chartStartOffset = (0...2).contains(storedOffset) ? storedOffset : 0
+
+        timeOffsetMinutes = UserDefaults.standard.object(forKey: "timeOffsetMinutes") as? Int ?? 0
+        beachWalkThresholdSafe = UserDefaults.standard.object(forKey: "beachWalkThresholdSafe") as? Double ?? 0.55
+        beachWalkThresholdLikely = UserDefaults.standard.object(forKey: "beachWalkThresholdLikely") as? Double ?? 0.65
+        beachWalkDeepCm = UserDefaults.standard.object(forKey: "beachWalkDeepCm") as? Int ?? 7
+        tideReferenceOffsetCm = UserDefaults.standard.object(forKey: "tide_reference_offset_cm") as? Int ?? 0
     }
 
     // MARK: - Data Loading
@@ -137,25 +177,7 @@ final class TideViewModel {
     // MARK: - Beach Walk
 
     private func applyBeachWalkPrediction(to days: [TideDay]) -> [TideDay] {
-        days.map { day in
-            var updated = day
-            updated.events = day.events.map { event in
-                var e = event
-                guard event.type == .lowTide else {
-                    e.beachWalkStatus = .none
-                    return e
-                }
-                if event.height <= beachWalkThresholdSafe {
-                    e.beachWalkStatus = .safe
-                } else if event.height <= beachWalkThresholdLikely {
-                    e.beachWalkStatus = .likely
-                } else {
-                    e.beachWalkStatus = .none
-                }
-                return e
-            }
-            return updated
-        }
+        TideBeachWalk.apply(to: days)
     }
 
     /// Convenience: old single threshold, kept for BeachWalkView gauge
@@ -286,36 +308,7 @@ final class TideViewModel {
 
     /// Hintergrund- und Textfarbe für Strandy-Anzeige (kontinuierlicher Verlauf nach Rohhöhe).
     func beachWalkGradientColors(rawHeight: Double) -> (background: Color, text: Color) {
-        let safe   = beachWalkThresholdSafe
-        let likely = beachWalkThresholdLikely
-        if rawHeight > likely {
-            return (.clear, .primary)
-        }
-
-        if rawHeight > safe {
-            let range = max(likely - safe, 0.001)
-            let t = (rawHeight - safe) / range
-            let hue        = 0.167 + (1.0 - t) * (0.333 - 0.167)
-            let saturation = 0.55 + (1.0 - t) * 0.20
-            let brightness = 0.92
-            return (Color(hue: hue, saturation: saturation, brightness: brightness), .black)
-        }
-
-        let deepThreshold = safe - Double(beachWalkDeepCm) / 100.0
-
-        if rawHeight > deepThreshold {
-            let range = max(safe - deepThreshold, 0.001)
-            let t = (safe - rawHeight) / range
-            let saturation = 0.38 + t * 0.27
-            let brightness = 0.90 - t * 0.05
-            return (Color(hue: 0.333, saturation: saturation, brightness: brightness), .black)
-        } else {
-            let depth = min(deepThreshold - rawHeight, 0.20)
-            let t = depth / 0.20
-            let saturation = 0.80 + t * 0.15
-            let brightness = 0.52 - t * 0.12
-            return (Color(hue: 0.333, saturation: saturation, brightness: brightness), .white)
-        }
+        TideBeachWalk.gradientColors(rawHeight: rawHeight)
     }
 
     // MARK: - Formatting

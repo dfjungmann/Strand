@@ -7,64 +7,183 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0446BFF7A5E37D602943EA2F /* TideDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C3FC20ED487699DD2E92D /* TideDisplaySettings.swift */; };
 		070CDFD1F7AC04313C762B03 /* BeachWalkView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */; };
+		0AAF6D09F87FA9B32717FCA0 /* TideService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */; };
+		135063188CB3A2FEE6C95474 /* WatchTideClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36334BEA88DB9AAA33F2D90E /* WatchTideClockView.swift */; };
+		14409FC2602479C46C4A4B37 /* TideService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */; };
+		17A4CD4108C50CFA07342474 /* StrandWatchWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 74EB7563BC2E3843DD7EF6C2 /* StrandWatchWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		17E9C8DD1F965D0BDFEFDF14 /* StrandApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 098356A9AD4ECC4271276BAD /* StrandApp.swift */; };
+		19ABC6393E9AEC6EEDC2F84C /* SettingsBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 335DE03CC4BC11A6FE3BF8D1 /* SettingsBackup.swift */; };
 		1B0156442CBA2564175E7698 /* TideClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 160E702BD8AD9974C80F88BA /* TideClockView.swift */; };
 		1B1399EDF0D0A6181C31CD30 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDAE6690AE9518CC7E7A0215 /* ContentView.swift */; };
+		1BF543A49CABDB33A7331A5E /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00E41AA107D07C5B4C6FDD61 /* WatchConnectivity.framework */; };
+		1FA5640BB162306BBEC57184 /* TideClockState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6849BA9D68145A456D98444 /* TideClockState.swift */; };
 		2102E1101E1B506A342680B0 /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655480A363D527F0B8163CC2 /* WeatherService.swift */; };
+		2207C792206A933BC23FF241 /* TideBeachWalk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F045628D7FB3D502FFEF4AA /* TideBeachWalk.swift */; };
+		258839FE03904E4DF9EFB6E6 /* TideSettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1BEEC803199EBF3CACCAD1 /* TideSettingsKeys.swift */; };
+		36074C7D3000EE7C76E8E19F /* WatchSettingsSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 617429FD31CB0A7426760DAA /* WatchSettingsSync.swift */; };
+		48F62C4CEF76CCE46B1C3382 /* FlipClockFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D954DA9876258897BBEC16 /* FlipClockFont.swift */; };
+		49B730DFA2A1C4B188214A95 /* TideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA039B176B6568DDD9B77A63 /* TideModels.swift */; };
+		4A226545B3B883FD056BC34E /* TideClockState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6849BA9D68145A456D98444 /* TideClockState.swift */; };
+		4FE130B4E76739659B04E33C /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D084D9B7FBC01A75A52C7A68 /* NotificationManager.swift */; };
+		511A5B0D285E524BD3B18A71 /* TideCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */; };
 		5B898008E639EC3E8A4EEE38 /* ChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18FB5ACC469E5D5636D23FC8 /* ChartView.swift */; };
+		5D1B451585F927664C3CCB8F /* TideBeachWalk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F045628D7FB3D502FFEF4AA /* TideBeachWalk.swift */; };
+		5DF6B2BD2AE014ED3A05B888 /* TideSettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1BEEC803199EBF3CACCAD1 /* TideSettingsKeys.swift */; };
+		623D23953AEE097286A99BCA /* TideDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C3FC20ED487699DD2E92D /* TideDisplaySettings.swift */; };
+		6697FE497423DC66A9D6727E /* TideComplicationDialView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3265B983C9F5857E1DC5BBA8 /* TideComplicationDialView.swift */; };
+		6AFB687243DABF087DEBAB35 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A6ED7A5689FE600373E7B4EA /* Assets.xcassets */; };
 		7269B07E278D6952FF1A6AEC /* AstronomyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C3D129F1B94B3AA82CA0916 /* AstronomyService.swift */; };
+		72EFA0A5644C1E3B4530A926 /* StrandWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71D7F4BEA0BD52EA3757D100 /* StrandWatchApp.swift */; };
+		850F8756DCBEACAA31F47B0A /* NotificationsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA320BCC6F012E7541E2F43 /* NotificationsSettingsView.swift */; };
+		86542C9FE770EEF7405B643D /* TideSettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C1BEEC803199EBF3CACCAD1 /* TideSettingsKeys.swift */; };
+		897E4881D139585E755DB2F3 /* TideComplicationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2134569F9DDE932452BE817A /* TideComplicationStore.swift */; };
 		94362AF0DA705C14FA45AD44 /* TideViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43493A1B112812438249B6F3 /* TideViewModel.swift */; };
 		9710D1C6517102085CDA3038 /* TideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA039B176B6568DDD9B77A63 /* TideModels.swift */; };
 		9985AF055C67228E7520B004 /* WeatherForecastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20112AF67C07ECD8302FDC3E /* WeatherForecastView.swift */; };
 		A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E08E74456BF3AC82D99827E /* TableView.swift */; };
 		AC551121E977632D9351133F /* MarineService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D22D3CFB932B739BBA7EAB5 /* MarineService.swift */; };
+		ACD33BA269437A8C008C7681 /* TideComplicationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2134569F9DDE932452BE817A /* TideComplicationStore.swift */; };
+		AE1CC40E47EEA130B42BC60D /* TideComplicationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2134569F9DDE932452BE817A /* TideComplicationStore.swift */; };
 		B1E1080DF01A34F5E6970406 /* WeatherMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53EE2D071A232010E553F17E /* WeatherMapView.swift */; };
 		B62362ECC5E270434E48CAF2 /* TideCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */; };
+		BCA8CEA6B1770A19F791BB38 /* WatchSettingsSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 617429FD31CB0A7426760DAA /* WatchSettingsSync.swift */; };
 		C1081940DAA6A42C8ECB7135 /* VerlaufView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA96211DF067468998AF8E3A /* VerlaufView.swift */; };
+		CB73C1A7DAAA1447FE711C58 /* WatchTideViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 265A0538716BE50798186FFC /* WatchTideViewModel.swift */; };
+		CD3047E51F8897AD377F3B33 /* TideComplicationWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73219BABF7E5449155E9F82C /* TideComplicationWidget.swift */; };
+		D1BFE78C034265D4C26ABF51 /* TideBeachWalk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F045628D7FB3D502FFEF4AA /* TideBeachWalk.swift */; };
 		D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */; };
+		D6BD4311E0DFF29AE6FF00AB /* StrandWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = D9E7796F55D72B945CB79CE5 /* StrandWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA028AEAC3247188CB0EB539 /* SettingsView.swift */; };
+		DFEEDE4940121FF9261E6970 /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00E41AA107D07C5B4C6FDD61 /* WatchConnectivity.framework */; };
 		E97F4B7A448AFD13A89997F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5EEBC1F2F904F87B154A7036 /* Assets.xcassets */; };
+		EAEB6377B05A5306740F638B /* DSEG-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 8D81578FB9A093E45E9C6E2B /* DSEG-LICENSE.txt */; };
+		EBA80132D380106091978375 /* TideDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C3FC20ED487699DD2E92D /* TideDisplaySettings.swift */; };
 		ED52E826DD5B362809C40075 /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241225197FA8E158FACB743A /* DayDetailView.swift */; };
-		F1A2B3C4D5E6F7A8B9C0D1E2 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B2C3D4E5F6A7B8C9D0E1F2 /* NotificationManager.swift */; };
-		B1C2D3E4F5A6B7C8D9E0F1A2 /* NotificationsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1D2E3F4A5B6C7D8E9F0A1B2 /* NotificationsSettingsView.swift */; };
-		A0B1C2D3E4F5A6B7C8D9E0F2 /* DSEG7Classic-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = F0A1B2C3D4E5F6A7B8C9D0E2 /* DSEG7Classic-Bold.ttf */; };
-		B0C1D2E3F4A5B6C7D8E9F0A3 /* FlipClockFont.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F1A2B3C4D5E6F7A8B9C0D3 /* FlipClockFont.swift */; };
+		ED8AE0318A4C0BA70CC90F30 /* TideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA039B176B6568DDD9B77A63 /* TideModels.swift */; };
+		F1E3F90B3AED83C985147F3B /* TideClockState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6849BA9D68145A456D98444 /* TideClockState.swift */; };
+		F81A7816FCC1A35AF625748B /* TideCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */; };
+		F93E00DCD240CAF855A32F18 /* DSEG7Classic-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2576DB5D56153025CC3DE178 /* DSEG7Classic-Bold.ttf */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		523F078259EDFEAD860717BA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 680A90FCF3461E4467905AE3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 2A52A8FC1556440C59E4A1D8;
+			remoteInfo = StrandWatch;
+		};
+		AFDA70AC51557B80B64DFB53 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 680A90FCF3461E4467905AE3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B7F16BB94A83F2FDC9721BDF;
+			remoteInfo = StrandWatchWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2D201F15C8EF7ABABA76B23B /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				D6BD4311E0DFF29AE6FF00AB /* StrandWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4F5FB67A29F79F46750AF71D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				17A4CD4108C50CFA07342474 /* StrandWatchWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		00E41AA107D07C5B4C6FDD61 /* WatchConnectivity.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WatchConnectivity.framework; path = System/Library/Frameworks/WatchConnectivity.framework; sourceTree = SDKROOT; };
 		098356A9AD4ECC4271276BAD /* StrandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrandApp.swift; sourceTree = "<group>"; };
 		160E702BD8AD9974C80F88BA /* TideClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideClockView.swift; sourceTree = "<group>"; };
 		18FB5ACC469E5D5636D23FC8 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
 		1F455BDF21623385D050052D /* Strand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		20112AF67C07ECD8302FDC3E /* WeatherForecastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherForecastView.swift; sourceTree = "<group>"; };
+		2134569F9DDE932452BE817A /* TideComplicationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideComplicationStore.swift; sourceTree = "<group>"; };
 		241225197FA8E158FACB743A /* DayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailView.swift; sourceTree = "<group>"; };
+		2576DB5D56153025CC3DE178 /* DSEG7Classic-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "DSEG7Classic-Bold.ttf"; sourceTree = "<group>"; };
+		265A0538716BE50798186FFC /* WatchTideViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTideViewModel.swift; sourceTree = "<group>"; };
+		2C1BEEC803199EBF3CACCAD1 /* TideSettingsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideSettingsKeys.swift; sourceTree = "<group>"; };
 		2C3D129F1B94B3AA82CA0916 /* AstronomyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AstronomyService.swift; sourceTree = "<group>"; };
+		2EEE6584A7EA0A0AF2481EC0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		3265B983C9F5857E1DC5BBA8 /* TideComplicationDialView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideComplicationDialView.swift; sourceTree = "<group>"; };
+		335DE03CC4BC11A6FE3BF8D1 /* SettingsBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBackup.swift; sourceTree = "<group>"; };
+		36334BEA88DB9AAA33F2D90E /* WatchTideClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTideClockView.swift; sourceTree = "<group>"; };
 		3D22D3CFB932B739BBA7EAB5 /* MarineService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarineService.swift; sourceTree = "<group>"; };
+		3F045628D7FB3D502FFEF4AA /* TideBeachWalk.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideBeachWalk.swift; sourceTree = "<group>"; };
 		428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeachWalkView.swift; sourceTree = "<group>"; };
 		43493A1B112812438249B6F3 /* TideViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideViewModel.swift; sourceTree = "<group>"; };
 		4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideService.swift; sourceTree = "<group>"; };
 		53EE2D071A232010E553F17E /* WeatherMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherMapView.swift; sourceTree = "<group>"; };
+		5731F4DDEF77D0194D109D2E /* StrandWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StrandWatchWidgets.entitlements; sourceTree = "<group>"; };
 		5EEBC1F2F904F87B154A7036 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		617429FD31CB0A7426760DAA /* WatchSettingsSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSettingsSync.swift; sourceTree = "<group>"; };
 		655480A363D527F0B8163CC2 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		6DA320BCC6F012E7541E2F43 /* NotificationsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsSettingsView.swift; sourceTree = "<group>"; };
+		71D7F4BEA0BD52EA3757D100 /* StrandWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrandWatchApp.swift; sourceTree = "<group>"; };
+		73219BABF7E5449155E9F82C /* TideComplicationWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideComplicationWidget.swift; sourceTree = "<group>"; };
+		74EB7563BC2E3843DD7EF6C2 /* StrandWatchWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StrandWatchWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D81578FB9A093E45E9C6E2B /* DSEG-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "DSEG-LICENSE.txt"; sourceTree = "<group>"; };
 		8E08E74456BF3AC82D99827E /* TableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableView.swift; sourceTree = "<group>"; };
+		9B7108DF507D69663360F2C8 /* StrandWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StrandWatch.entitlements; sourceTree = "<group>"; };
+		A6ED7A5689FE600373E7B4EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B02E7986B82E04368ACA8677 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		B1D954DA9876258897BBEC16 /* FlipClockFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipClockFont.swift; sourceTree = "<group>"; };
 		BA96211DF067468998AF8E3A /* VerlaufView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerlaufView.swift; sourceTree = "<group>"; };
+		C54C3FC20ED487699DD2E92D /* TideDisplaySettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideDisplaySettings.swift; sourceTree = "<group>"; };
+		D084D9B7FBC01A75A52C7A68 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		D9E7796F55D72B945CB79CE5 /* StrandWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StrandWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideCache.swift; sourceTree = "<group>"; };
 		EA028AEAC3247188CB0EB539 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		EDAE6690AE9518CC7E7A0215 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		F6849BA9D68145A456D98444 /* TideClockState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideClockState.swift; sourceTree = "<group>"; };
 		FA039B176B6568DDD9B77A63 /* TideModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideModels.swift; sourceTree = "<group>"; };
 		FA55C59034089AD3E6C16D63 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
-		A1B2C3D4E5F6A7B8C9D0E1F2 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
-		C1D2E3F4A5B6C7D8E9F0A1B2 /* NotificationsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsSettingsView.swift; sourceTree = "<group>"; };
-		E0F1A2B3C4D5E6F7A8B9C0D3 /* FlipClockFont.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlipClockFont.swift; sourceTree = "<group>"; };
-		F0A1B2C3D4E5F6A7B8C9D0E2 /* DSEG7Classic-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = DSEG7Classic-Bold.ttf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3CEC3E5D0E336D715CBE4ECF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1BF543A49CABDB33A7331A5E /* WatchConnectivity.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5788B2B371AB98C696945635 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DFEEDE4940121FF9261E6970 /* WatchConnectivity.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		0497C8EA52DF82EAD330F728 /* Products */ = {
 			isa = PBXGroup;
 			children = (
 				1F455BDF21623385D050052D /* Strand.app */,
+				D9E7796F55D72B945CB79CE5 /* StrandWatch.app */,
+				74EB7563BC2E3843DD7EF6C2 /* StrandWatchWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,7 +194,7 @@
 				428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */,
 				18FB5ACC469E5D5636D23FC8 /* ChartView.swift */,
 				241225197FA8E158FACB743A /* DayDetailView.swift */,
-				C1D2E3F4A5B6C7D8E9F0A1B2 /* NotificationsSettingsView.swift */,
+				6DA320BCC6F012E7541E2F43 /* NotificationsSettingsView.swift */,
 				EA028AEAC3247188CB0EB539 /* SettingsView.swift */,
 				8E08E74456BF3AC82D99827E /* TableView.swift */,
 				160E702BD8AD9974C80F88BA /* TideClockView.swift */,
@@ -86,12 +205,35 @@
 			path = Views;
 			sourceTree = "<group>";
 		};
+		313DA872F192F8B2263D2D4E /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				B1D954DA9876258897BBEC16 /* FlipClockFont.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		4B3D27C5CF4E00E9334AB072 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				3F045628D7FB3D502FFEF4AA /* TideBeachWalk.swift */,
+				F6849BA9D68145A456D98444 /* TideClockState.swift */,
+				C54C3FC20ED487699DD2E92D /* TideDisplaySettings.swift */,
 				FA039B176B6568DDD9B77A63 /* TideModels.swift */,
+				2C1BEEC803199EBF3CACCAD1 /* TideSettingsKeys.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		4B92C5D92882CFCED86898CF /* StrandWatchWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				B02E7986B82E04368ACA8677 /* Info.plist */,
+				5731F4DDEF77D0194D109D2E /* StrandWatchWidgets.entitlements */,
+				3265B983C9F5857E1DC5BBA8 /* TideComplicationDialView.swift */,
+				73219BABF7E5449155E9F82C /* TideComplicationWidget.swift */,
+			);
+			path = StrandWatchWidgets;
 			sourceTree = "<group>";
 		};
 		4C3F8EB3C8A0C8E14C9B5131 /* Strand */ = {
@@ -99,10 +241,10 @@
 			children = (
 				5EEBC1F2F904F87B154A7036 /* Assets.xcassets */,
 				EDAE6690AE9518CC7E7A0215 /* ContentView.swift */,
-				7A8B9C0D1E2F3A4B5C6D7E8F /* Extensions */,
-				8B9C0D1E2F3A4B5C6D7E8F9A /* Fonts */,
 				FA55C59034089AD3E6C16D63 /* Info.plist */,
 				098356A9AD4ECC4271276BAD /* StrandApp.swift */,
+				313DA872F192F8B2263D2D4E /* Extensions */,
+				AC1BC1D702F5EC887CE86471 /* Fonts */,
 				4B3D27C5CF4E00E9334AB072 /* Models */,
 				BDDE950AC30C6FA45EB64D8D /* Services */,
 				5586DBC263A4932566673FDC /* ViewModels */,
@@ -123,8 +265,20 @@
 			isa = PBXGroup;
 			children = (
 				4C3F8EB3C8A0C8E14C9B5131 /* Strand */,
+				F56B4E9FDAD50D1EB5475507 /* StrandWatch */,
+				4B92C5D92882CFCED86898CF /* StrandWatchWidgets */,
+				D729184204A04D75CD6CE021 /* Frameworks */,
 				0497C8EA52DF82EAD330F728 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		AC1BC1D702F5EC887CE86471 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				8D81578FB9A093E45E9C6E2B /* DSEG-LICENSE.txt */,
+				2576DB5D56153025CC3DE178 /* DSEG7Classic-Bold.ttf */,
+			);
+			path = Fonts;
 			sourceTree = "<group>";
 		};
 		BDDE950AC30C6FA45EB64D8D /* Services */ = {
@@ -132,43 +286,75 @@
 			children = (
 				2C3D129F1B94B3AA82CA0916 /* AstronomyService.swift */,
 				3D22D3CFB932B739BBA7EAB5 /* MarineService.swift */,
-				A1B2C3D4E5F6A7B8C9D0E1F2 /* NotificationManager.swift */,
+				D084D9B7FBC01A75A52C7A68 /* NotificationManager.swift */,
+				335DE03CC4BC11A6FE3BF8D1 /* SettingsBackup.swift */,
 				DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */,
+				2134569F9DDE932452BE817A /* TideComplicationStore.swift */,
 				4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */,
+				617429FD31CB0A7426760DAA /* WatchSettingsSync.swift */,
 				655480A363D527F0B8163CC2 /* WeatherService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
 		};
-		7A8B9C0D1E2F3A4B5C6D7E8F /* Extensions */ = {
+		D729184204A04D75CD6CE021 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				E0F1A2B3C4D5E6F7A8B9C0D3 /* FlipClockFont.swift */,
+				00E41AA107D07C5B4C6FDD61 /* WatchConnectivity.framework */,
 			);
-			path = Extensions;
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		8B9C0D1E2F3A4B5C6D7E8F9A /* Fonts */ = {
+		F56B4E9FDAD50D1EB5475507 /* StrandWatch */ = {
 			isa = PBXGroup;
 			children = (
-				F0A1B2C3D4E5F6A7B8C9D0E2 /* DSEG7Classic-Bold.ttf */,
+				A6ED7A5689FE600373E7B4EA /* Assets.xcassets */,
+				2EEE6584A7EA0A0AF2481EC0 /* Info.plist */,
+				9B7108DF507D69663360F2C8 /* StrandWatch.entitlements */,
+				71D7F4BEA0BD52EA3757D100 /* StrandWatchApp.swift */,
+				36334BEA88DB9AAA33F2D90E /* WatchTideClockView.swift */,
+				265A0538716BE50798186FFC /* WatchTideViewModel.swift */,
 			);
-			path = Fonts;
+			path = StrandWatch;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		2A52A8FC1556440C59E4A1D8 /* StrandWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 899C609E5A798C70B1CBD1C9 /* Build configuration list for PBXNativeTarget "StrandWatch" */;
+			buildPhases = (
+				AB870F12192A6F7CFD6865E7 /* Sources */,
+				50622A6DBFBF77EAF8112BF7 /* Resources */,
+				3CEC3E5D0E336D715CBE4ECF /* Frameworks */,
+				4F5FB67A29F79F46750AF71D /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				31B9518AE7E0C21C2FD00B28 /* PBXTargetDependency */,
+			);
+			name = StrandWatch;
+			packageProductDependencies = (
+			);
+			productName = StrandWatch;
+			productReference = D9E7796F55D72B945CB79CE5 /* StrandWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
 		A20C526AADBE62B508570EA4 /* Strand */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 954E11B078688E7AAE145D61 /* Build configuration list for PBXNativeTarget "Strand" */;
 			buildPhases = (
 				3CD6E2216EB5830EBE7D63C9 /* Sources */,
 				B10341BF661CB86C517F7CC9 /* Resources */,
+				5788B2B371AB98C696945635 /* Frameworks */,
+				2D201F15C8EF7ABABA76B23B /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				3FE46CC4B2BE38A223288CC4 /* PBXTargetDependency */,
 			);
 			name = Strand;
 			packageProductDependencies = (
@@ -177,6 +363,23 @@
 			productReference = 1F455BDF21623385D050052D /* Strand.app */;
 			productType = "com.apple.product-type.application";
 		};
+		B7F16BB94A83F2FDC9721BDF /* StrandWatchWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 86E14F82523DEC2F4DFFA399 /* Build configuration list for PBXNativeTarget "StrandWatchWidgets" */;
+			buildPhases = (
+				EBED5C1DF7E540186A08EFE3 /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = StrandWatchWidgets;
+			packageProductDependencies = (
+			);
+			productName = StrandWatchWidgets;
+			productReference = 74EB7563BC2E3843DD7EF6C2 /* StrandWatchWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,9 +387,18 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 2650;
 				TargetAttributes = {
+					2A52A8FC1556440C59E4A1D8 = {
+						DevelopmentTeam = 47D76MD2KB;
+						ProvisioningStyle = Automatic;
+					};
 					A20C526AADBE62B508570EA4 = {
+						DevelopmentTeam = 47D76MD2KB;
+						ProvisioningStyle = Automatic;
+					};
+					B7F16BB94A83F2FDC9721BDF = {
+						DevelopmentTeam = 47D76MD2KB;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -206,17 +418,28 @@
 			projectRoot = "";
 			targets = (
 				A20C526AADBE62B508570EA4 /* Strand */,
+				2A52A8FC1556440C59E4A1D8 /* StrandWatch */,
+				B7F16BB94A83F2FDC9721BDF /* StrandWatchWidgets */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		50622A6DBFBF77EAF8112BF7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6AFB687243DABF087DEBAB35 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		B10341BF661CB86C517F7CC9 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				E97F4B7A448AFD13A89997F3 /* Assets.xcassets in Resources */,
-				A0B1C2D3E4F5A6B7C8D9E0F2 /* DSEG7Classic-Bold.ttf in Resources */,
+				EAEB6377B05A5306740F638B /* DSEG-LICENSE.txt in Resources */,
+				F93E00DCD240CAF855A32F18 /* DSEG7Classic-Bold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -232,26 +455,82 @@
 				5B898008E639EC3E8A4EEE38 /* ChartView.swift in Sources */,
 				1B1399EDF0D0A6181C31CD30 /* ContentView.swift in Sources */,
 				ED52E826DD5B362809C40075 /* DayDetailView.swift in Sources */,
+				48F62C4CEF76CCE46B1C3382 /* FlipClockFont.swift in Sources */,
 				AC551121E977632D9351133F /* MarineService.swift in Sources */,
-				F1A2B3C4D5E6F7A8B9C0D1E2 /* NotificationManager.swift in Sources */,
-				B1C2D3E4F5A6B7C8D9E0F1A2 /* NotificationsSettingsView.swift in Sources */,
-				B0C1D2E3F4A5B6C7D8E9F0A3 /* FlipClockFont.swift in Sources */,
+				4FE130B4E76739659B04E33C /* NotificationManager.swift in Sources */,
+				850F8756DCBEACAA31F47B0A /* NotificationsSettingsView.swift in Sources */,
+				19ABC6393E9AEC6EEDC2F84C /* SettingsBackup.swift in Sources */,
 				DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */,
 				17E9C8DD1F965D0BDFEFDF14 /* StrandApp.swift in Sources */,
 				A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */,
+				5D1B451585F927664C3CCB8F /* TideBeachWalk.swift in Sources */,
 				B62362ECC5E270434E48CAF2 /* TideCache.swift in Sources */,
+				1FA5640BB162306BBEC57184 /* TideClockState.swift in Sources */,
 				1B0156442CBA2564175E7698 /* TideClockView.swift in Sources */,
+				AE1CC40E47EEA130B42BC60D /* TideComplicationStore.swift in Sources */,
+				0446BFF7A5E37D602943EA2F /* TideDisplaySettings.swift in Sources */,
 				9710D1C6517102085CDA3038 /* TideModels.swift in Sources */,
 				D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */,
+				86542C9FE770EEF7405B643D /* TideSettingsKeys.swift in Sources */,
 				94362AF0DA705C14FA45AD44 /* TideViewModel.swift in Sources */,
 				C1081940DAA6A42C8ECB7135 /* VerlaufView.swift in Sources */,
+				BCA8CEA6B1770A19F791BB38 /* WatchSettingsSync.swift in Sources */,
 				9985AF055C67228E7520B004 /* WeatherForecastView.swift in Sources */,
 				B1E1080DF01A34F5E6970406 /* WeatherMapView.swift in Sources */,
 				2102E1101E1B506A342680B0 /* WeatherService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AB870F12192A6F7CFD6865E7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				72EFA0A5644C1E3B4530A926 /* StrandWatchApp.swift in Sources */,
+				D1BFE78C034265D4C26ABF51 /* TideBeachWalk.swift in Sources */,
+				511A5B0D285E524BD3B18A71 /* TideCache.swift in Sources */,
+				F1E3F90B3AED83C985147F3B /* TideClockState.swift in Sources */,
+				897E4881D139585E755DB2F3 /* TideComplicationStore.swift in Sources */,
+				EBA80132D380106091978375 /* TideDisplaySettings.swift in Sources */,
+				49B730DFA2A1C4B188214A95 /* TideModels.swift in Sources */,
+				0AAF6D09F87FA9B32717FCA0 /* TideService.swift in Sources */,
+				5DF6B2BD2AE014ED3A05B888 /* TideSettingsKeys.swift in Sources */,
+				36074C7D3000EE7C76E8E19F /* WatchSettingsSync.swift in Sources */,
+				135063188CB3A2FEE6C95474 /* WatchTideClockView.swift in Sources */,
+				CB73C1A7DAAA1447FE711C58 /* WatchTideViewModel.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EBED5C1DF7E540186A08EFE3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2207C792206A933BC23FF241 /* TideBeachWalk.swift in Sources */,
+				F81A7816FCC1A35AF625748B /* TideCache.swift in Sources */,
+				4A226545B3B883FD056BC34E /* TideClockState.swift in Sources */,
+				6697FE497423DC66A9D6727E /* TideComplicationDialView.swift in Sources */,
+				ACD33BA269437A8C008C7681 /* TideComplicationStore.swift in Sources */,
+				CD3047E51F8897AD377F3B33 /* TideComplicationWidget.swift in Sources */,
+				623D23953AEE097286A99BCA /* TideDisplaySettings.swift in Sources */,
+				ED8AE0318A4C0BA70CC90F30 /* TideModels.swift in Sources */,
+				14409FC2602479C46C4A4B37 /* TideService.swift in Sources */,
+				258839FE03904E4DF9EFB6E6 /* TideSettingsKeys.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		31B9518AE7E0C21C2FD00B28 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B7F16BB94A83F2FDC9721BDF /* StrandWatchWidgets */;
+			targetProxy = AFDA70AC51557B80B64DFB53 /* PBXContainerItemProxy */;
+		};
+		3FE46CC4B2BE38A223288CC4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 2A52A8FC1556440C59E4A1D8 /* StrandWatch */;
+			targetProxy = 523F078259EDFEAD860717BA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		01DC0922AA823A8EAADDC6C1 /* Release */ = {
@@ -259,13 +538,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 47D76MD2KB;
 				INFOPLIST_FILE = Strand/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_SWIFT_FLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = de.dietmar.Strand;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -276,13 +554,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
-				DEVELOPMENT_TEAM = 47D76MD2KB;
 				INFOPLIST_FILE = Strand/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				OTHER_SWIFT_FLAGS = "";
+				PRODUCT_BUNDLE_IDENTIFIER = de.dietmar.Strand;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -324,9 +601,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 47D76MD2KB;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -339,14 +619,34 @@
 				MARKETING_VERSION = 1.5;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = de.dietmar.Strand;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.9;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Release;
+		};
+		6EC0A05B1E20759A7C292672 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = StrandWatchWidgets/StrandWatchWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 47D76MD2KB;
+				INFOPLIST_FILE = StrandWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.dietmar.Strand.watchkitapp.widgets;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
 		};
 		984C9F73BD1CCE5BBB94B83F /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -384,9 +684,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 47D76MD2KB;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -406,14 +709,72 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = de.dietmar.Strand;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.9;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
 			};
 			name = Debug;
+		};
+		9DE07DCEB75922BC1D05A426 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = StrandWatchWidgets/StrandWatchWidgets.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 47D76MD2KB;
+				INFOPLIST_FILE = StrandWatchWidgets/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = de.dietmar.Strand.watchkitapp.widgets;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
+		};
+		A81493B13D096C8622954CAE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = StrandWatch/StrandWatch.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 47D76MD2KB;
+				INFOPLIST_FILE = StrandWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Strand;
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = de.dietmar.Strand;
+				PRODUCT_BUNDLE_IDENTIFIER = de.dietmar.Strand.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Debug;
+		};
+		E40D87831486BA6FDE9101D6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = StrandWatch/StrandWatch.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 47D76MD2KB;
+				INFOPLIST_FILE = StrandWatch/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Strand;
+				INFOPLIST_KEY_WKApplication = YES;
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = de.dietmar.Strand;
+				PRODUCT_BUNDLE_IDENTIFIER = de.dietmar.Strand.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+			};
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -423,6 +784,24 @@
 			buildConfigurations = (
 				984C9F73BD1CCE5BBB94B83F /* Debug */,
 				2CB5CEE07F2585427C226CAE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		86E14F82523DEC2F4DFFA399 /* Build configuration list for PBXNativeTarget "StrandWatchWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				6EC0A05B1E20759A7C292672 /* Debug */,
+				9DE07DCEB75922BC1D05A426 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		899C609E5A798C70B1CBD1C9 /* Build configuration list for PBXNativeTarget "StrandWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A81493B13D096C8622954CAE /* Debug */,
+				E40D87831486BA6FDE9101D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
