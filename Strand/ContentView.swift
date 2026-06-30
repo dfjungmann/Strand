@@ -1,8 +1,8 @@
 import SwiftUI
 
 struct ContentView: View {
-    @State private var viewModel   = TideViewModel()
-    @State private var selectedTab = 0
+    @State private var viewModel = TideViewModel()
+    @AppStorage("last_selected_tab") private var selectedTab = 0
 
     var body: some View {
         TabView(selection: $selectedTab) {
@@ -35,8 +35,23 @@ struct ContentView: View {
                 .tabItem { Label("Einstellungen", systemImage: "gearshape") }
                 .tag(5)
         }
+        .background(TabBarReselectObserver(tabIndex: 1, notificationName: .clockTabReselected))
+        .onAppear { selectedTab = Self.normalizedTab(selectedTab) }
         .task { await viewModel.loadTides() }
         .onAppear { WatchSettingsSync.shared.pushFromPhone() }
+    }
+
+    /// Gültiger Tab-Index (Radar-Tab nur wenn eingebunden).
+    private static func normalizedTab(_ tab: Int) -> Int {
+        #if INCLUDE_RADAR
+        (0...5).contains(tab) ? tab : 0
+        #else
+        switch tab {
+        case 0, 1, 2, 3, 5: tab
+        case 4: 3
+        default: 0
+        }
+        #endif
     }
 }
 

@@ -156,11 +156,25 @@ struct TideClockState {
     }
 
     static let pastLowPages = 1
-    static let futureLowPages = 5
+    static let futureLowPages = 9
+    static let watchPastLowPages = 1
+    static let watchFutureCalendarDays = 4
 
-    /// Ebben im Umfang 1 zurück + 5 voraus (je eine Swipe-Seite).
+    /// Ebben im Umfang 1 zurück + 9 voraus (je eine Swipe-Seite, ca. 4–5 Tage).
     var ebbeSwipePages: [TideEbbePage] {
-        allowedLowTidesForSwipe().map { low in
+        makeEbbePages(from: allowedLowTidesForSwipe())
+    }
+
+    /// Watch: 1 Ebbe zurück + alle Ebben in den nächsten 4 Kalendertagen.
+    var watchEbbeSwipePages: [TideEbbePage] {
+        makeEbbePages(from: allowedLowTidesForSwipe(
+            pastCount: Self.watchPastLowPages,
+            withinCalendarDays: Self.watchFutureCalendarDays
+        ))
+    }
+
+    private func makeEbbePages(from lows: [TideEvent]) -> [TideEbbePage] {
+        lows.map { low in
             TideEbbePage(
                 lowTide: low,
                 highBefore: events.last { $0.type == .highTide && $0.adjustedTime < low.adjustedTime },
@@ -171,8 +185,12 @@ struct TideClockState {
 
     /// Live-Seite: Ebbe laut 3-h-Regel (`displayedLowTide`).
     var activeLiveEbbePageIndex: Int? {
+        livePageIndex(in: ebbeSwipePages)
+    }
+
+    func livePageIndex(in pages: [TideEbbePage]) -> Int? {
         guard let liveLow = displayedLowTide?.event else { return nil }
-        return ebbeSwipePages.firstIndex { $0.lowTide.id == liveLow.id }
+        return pages.firstIndex { $0.lowTide.id == liveLow.id }
     }
 
     func previewTimeLabel(for event: TideEvent) -> String {
@@ -247,14 +265,35 @@ struct TideClockState {
         return strandyArcWindow(for: low)
     }
 
-    private func allowedLowTidesForSwipe() -> [TideEvent] {
-        let lows = events.filter { $0.type == .lowTide }
+    private func allowedLowTidesForSwipe(
+        pastCount: Int = Self.pastLowPages,
+        futureCount: Int = Self.futureLowPages,
+        withinCalendarDays: Int? = nil
+    ) -> [TideEvent] {
+        var lows = events.filter { $0.type == .lowTide }
         guard !lows.isEmpty else { return [] }
+
+        if let days = withinCalendarDays {
+            var cal = Calendar(identifier: .gregorian)
+            cal.timeZone = TideService.canaryIslandsTimeZone
+            let dayStart = cal.startOfDay(for: now)
+            if let end = cal.date(byAdding: .day, value: days, to: dayStart) {
+                lows = lows.filter { $0.adjustedTime < end }
+            }
+        }
+
         if let past = lows.last(where: { $0.adjustedTime <= now }) {
             let upcoming = lows.filter { $0.adjustedTime > past.adjustedTime }
-            return [past] + Array(upcoming.prefix(Self.futureLowPages))
+            if withinCalendarDays != nil {
+                return [past] + upcoming
+            }
+            return [past] + Array(upcoming.prefix(futureCount))
         }
-        return Array(lows.prefix(Self.pastLowPages + Self.futureLowPages))
+
+        if withinCalendarDays != nil {
+            return lows
+        }
+        return Array(lows.prefix(pastCount + futureCount))
     }
 
     /// Erster Zeitpunkt auf fallendem Ast (Flut→Ebbe), an dem Höhe ≤ Schwelle.

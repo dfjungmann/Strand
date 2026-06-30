@@ -1,10 +1,10 @@
 import SwiftUI
+import WatchKit
 
-/// Gezeiten-Uhr für Apple Watch (Layout angelehnt an iPhone / Bild 2).
+/// Gezeiten-Uhr für Apple Watch — Live per Krone zu Vorschau-Ebben (4 Tage).
 struct WatchTideClockView: View {
     let viewModel: WatchTideViewModel
 
-    // Farben wie TideClockView (iPhone)
     private let skyBackground = Color(red: 0.82, green: 0.91, blue: 0.97)
     private let heightBlue = Color(red: 0.08, green: 0.32, blue: 0.72)
     private let markerBlue = Color(red: 0.35, green: 0.55, blue: 0.82)
@@ -12,11 +12,29 @@ struct WatchTideClockView: View {
     private let outerLabelTime = Color(white: 0.08)
     private let outerLabelHeight = Color(white: 0.18)
 
+    private let crownThreshold = 18.0
+    private let crownParallaxFraction = 0.11
+    private let crownEdgeResistance = 0.22
+
     @State private var now = Date()
+    @State private var selectedPageIndex = 0
+    @State private var followLivePage = true
+    @State private var crownValue: Double = 0
+    @State private var crownAccumulator: Double = 0
+    @State private var lastCrownValue: Double = 0
+
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var clock: TideClockState {
         TideClockState(now: now, events: viewModel.allEvents)
+    }
+
+    private var ebbePages: [TideClockState.TideEbbePage] {
+        clock.watchEbbeSwipePages
+    }
+
+    private var livePageIndex: Int {
+        clock.livePageIndex(in: ebbePages) ?? 0
     }
 
     private var tz: TimeZone { TideService.canaryIslandsTimeZone }
@@ -36,6 +54,10 @@ struct WatchTideClockView: View {
                         .foregroundStyle(outerLabelTime)
                         .multilineTextAlignment(.center)
                 }
+            } else if ebbePages.isEmpty {
+                Text("Keine Gezeitendaten")
+                    .font(.caption2)
+                    .foregroundStyle(outerLabelTime)
             } else {
                 clockContent
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -44,37 +66,162 @@ struct WatchTideClockView: View {
         .background(skyBackground)
         .ignoresSafeArea()
         .persistentSystemOverlays(.hidden)
-        .onReceive(timer) { now = $0 }
+        .focusable(true)
+        .digitalCrownRotation(
+            $crownValue,
+            from: -200,
+            through: 200,
+            by: 0.25,
+            sensitivity: .medium,
+            isContinuous: true,
+            isHapticFeedbackEnabled: false
+        )
+        .onChange(of: crownValue) { _, newValue in
+            handleCrownRotation(newValue)
+        }
+        .onAppear {
+            followLivePage = true
+            lastCrownValue = crownValue
+            syncToLivePage(animated: false)
+        }
+        .onReceive(timer) { tick in
+            now = tick
+            if followLivePage {
+                syncToLivePage(animated: true)
+            }
+        }
+        .onChange(of: ebbePages.count) { _, _ in
+            clampSelectedPage()
+        }
     }
 
     private var clockContent: some View {
         GeometryReader { geo in
+            let page = ebbePages[selectedPageIndex]
+            let isLive = selectedPageIndex == livePageIndex
             let w = geo.size.width
             let h = geo.size.height
             let tideFontSize = w * 0.088
             let cx = w / 2
             let cy = h / 2
-            // Volle Fläche nutzen — Kreis nach kleinerer Kante, nicht nach Text-Resthöhe
             let r = min(w, h) * 0.49
 
+            let parallaxY = crownParallaxOffset(screenHeight: h)
+
             ZStack {
-                clockFace(cx: cx, cy: cy, r: r)
-                needle(cx: cx, cy: cy, r: r)
-                heightLabel(cx: cx, cy: cy, r: r)
-                centerReadout(cx: cx, cy: cy, r: r)
+                clockFace(page: page, cx: cx, cy: cy, r: r)
+
+                if isLive {
+                    needle(cx: cx, cy: cy, r: r)
+                    heightLabel(cx: cx, cy: cy, r: r)
+                    centerReadout(cx: cx, cy: cy, r: r)
+                }
 
                 VStack(spacing: 2) {
-                    tideHighRow(fontSize: tideFontSize, width: w)
+                    if isLive {
+                        tideHighRow(fontSize: tideFontSize, width: w)
+                    } else {
+                        previewHighTidesRow(page: page, fontSize: tideFontSize * 0.92, width: w)
+                    }
                     Spacer(minLength: 0)
-                    tideLowRow(fontSize: tideFontSize, width: w)
+                    if isLive {
+                        tideLowRow(fontSize: tideFontSize, width: w)
+                    } else {
+                        previewLowTideRow(page: page, fontSize: tideFontSize, width: w)
+                    }
                 }
                 .padding(.horizontal, 1)
                 .padding(.vertical, 1)
             }
+            .offset(y: parallaxY)
+        }
+        .clipped()
+    }
+
+    /// Vertikale Krone-Rückmeldung: Inhalt gleitet mit, nächste Ebbe = nach oben.
+    private func crownParallaxProgress() -> Double {
+        guard crownThreshold > 0, !ebbePages.isEmpty else { return 0 }
+
+        var progress = crownAccumulator / crownThreshold
+
+        if selectedPageIndex == 0, progress < 0 {
+            progress *= crownEdgeResistance
+        }
+        if selectedPageIndex >= ebbePages.count - 1, progress > 0 {
+            progress *= crownEdgeResistance
+        }
+
+        return max(-1, min(1, progress))
+    }
+
+    private func crownParallaxOffset(screenHeight: CGFloat) -> CGFloat {
+        -CGFloat(crownParallaxProgress()) * screenHeight * crownParallaxFraction
+    }
+
+    // MARK: - Crown navigation
+
+    private func handleCrownRotation(_ newValue: Double) {
+        guard !ebbePages.isEmpty else { return }
+
+        let delta = newValue - lastCrownValue
+        lastCrownValue = newValue
+
+        // Sprünge durch interne Krone-Normalisierung ignorieren
+        guard abs(delta) <= 20 else { return }
+
+        crownAccumulator += delta
+        processCrownAccumulator()
+    }
+
+    private func processCrownAccumulator() {
+        while crownAccumulator >= crownThreshold {
+            guard selectedPageIndex < ebbePages.count - 1 else {
+                crownAccumulator = min(crownAccumulator, crownThreshold * crownEdgeResistance)
+                return
+            }
+            stepPage(by: 1)
+            crownAccumulator -= crownThreshold
+            WKInterfaceDevice.current().play(.click)
+        }
+
+        while crownAccumulator <= -crownThreshold {
+            guard selectedPageIndex > 0 else {
+                crownAccumulator = max(crownAccumulator, -crownThreshold * crownEdgeResistance)
+                return
+            }
+            stepPage(by: -1)
+            crownAccumulator += crownThreshold
+            WKInterfaceDevice.current().play(.click)
         }
     }
 
-    // MARK: - Tide info
+    private func stepPage(by offset: Int) {
+        let newIndex = min(max(selectedPageIndex + offset, 0), ebbePages.count - 1)
+        guard newIndex != selectedPageIndex else { return }
+        withAnimation(.easeInOut(duration: 0.25)) {
+            selectedPageIndex = newIndex
+        }
+        followLivePage = (newIndex == livePageIndex)
+    }
+
+    private func syncToLivePage(animated: Bool) {
+        let target = livePageIndex
+        guard target != selectedPageIndex else { return }
+        if animated {
+            withAnimation(.easeInOut(duration: 0.25)) {
+                selectedPageIndex = target
+            }
+        } else {
+            selectedPageIndex = target
+        }
+    }
+
+    private func clampSelectedPage() {
+        guard !ebbePages.isEmpty else { return }
+        selectedPageIndex = min(selectedPageIndex, ebbePages.count - 1)
+    }
+
+    // MARK: - Live tide rows
 
     @ViewBuilder
     private func tideHighRow(fontSize: CGFloat, width: CGFloat) -> some View {
@@ -122,10 +269,65 @@ struct WatchTideClockView: View {
             .foregroundStyle(color)
     }
 
+    // MARK: - Preview tide rows
+
+    @ViewBuilder
+    private func previewHighTidesRow(
+        page: TideClockState.TideEbbePage,
+        fontSize: CGFloat,
+        width: CGFloat
+    ) -> some View {
+        HStack(alignment: .top, spacing: 4) {
+            if let highBefore = page.highBefore {
+                Text(clock.previewTimeLabel(for: highBefore))
+                    .frame(maxWidth: .infinity)
+            } else {
+                Color.clear.frame(maxWidth: .infinity)
+            }
+            if let highAfter = page.highAfter {
+                Text(clock.previewTimeLabel(for: highAfter))
+                    .frame(maxWidth: .infinity)
+            } else {
+                Color.clear.frame(maxWidth: .infinity)
+            }
+        }
+        .font(.system(size: fontSize, weight: .semibold, design: .rounded))
+        .foregroundStyle(outerLabelTime)
+        .multilineTextAlignment(.center)
+        .lineLimit(2)
+        .minimumScaleFactor(0.55)
+        .frame(maxWidth: width - 2)
+    }
+
+    @ViewBuilder
+    private func previewLowTideRow(
+        page: TideClockState.TideEbbePage,
+        fontSize: CGFloat,
+        width: CGFloat
+    ) -> some View {
+        VStack(spacing: 1) {
+            Text(clock.previewTimeLabel(for: page.lowTide))
+                .foregroundStyle(outerLabelTime)
+            Text(tideHeightLabel(page.lowTide.height))
+                .foregroundStyle(outerLabelHeight)
+        }
+        .font(.system(size: fontSize, weight: .bold, design: .monospaced))
+        .monospacedDigit()
+        .multilineTextAlignment(.center)
+        .lineLimit(2)
+        .minimumScaleFactor(0.55)
+        .frame(maxWidth: width - 2)
+    }
+
     // MARK: - Face
 
     @ViewBuilder
-    private func clockFace(cx: CGFloat, cy: CGFloat, r: CGFloat) -> some View {
+    private func clockFace(
+        page: TideClockState.TideEbbePage,
+        cx: CGFloat,
+        cy: CGFloat,
+        r: CGFloat
+    ) -> some View {
         Canvas { ctx, _ in
             fillRing(ctx, cx, cy, r * 0.87, r, Color(white: 0.74))
             fillRing(ctx, cx, cy, r * 0.845, r * 0.87, Color(red: 0.88, green: 0.72, blue: 0.22))
@@ -138,19 +340,18 @@ struct WatchTideClockView: View {
                 with: .color(Color(red: 0.97, green: 0.98, blue: 1.0))
             )
 
-            if let arc = clock.strandyArcWindow {
-                let window = arc
+            if let arc = clock.strandyArcWindow(for: page.lowTide) {
                 TideBeachWalk.drawStrandyArcStroke(
                     &ctx,
                     cx: cx,
                     cy: cy,
                     arcRadius: r * 0.66,
-                    startClockAngleDeg: window.startClockAngleDeg,
-                    endClockAngleDeg: window.endClockAngleDeg,
+                    startClockAngleDeg: arc.startClockAngleDeg,
+                    endClockAngleDeg: arc.endClockAngleDeg,
                     lineWidth: r * 0.18,
                     heightAtFraction: { fraction in
-                        let span = window.endTime.timeIntervalSince(window.startTime)
-                        let t = window.startTime.addingTimeInterval(span * fraction)
+                        let span = arc.endTime.timeIntervalSince(arc.startTime)
+                        let t = arc.startTime.addingTimeInterval(span * fraction)
                         return clock.height(at: t) ?? 0
                     }
                 )
@@ -205,7 +406,7 @@ struct WatchTideClockView: View {
         ctx.fill(p, with: .color(color))
     }
 
-    // MARK: - Needle
+    // MARK: - Needle (live only)
 
     @ViewBuilder
     private func needle(cx: CGFloat, cy: CGFloat, r: CGFloat) -> some View {
@@ -249,8 +450,6 @@ struct WatchTideClockView: View {
         }
         .allowsHitTesting(false)
     }
-
-    // MARK: - Labels
 
     @ViewBuilder
     private func heightLabel(cx: CGFloat, cy: CGFloat, r: CGFloat) -> some View {
@@ -342,7 +541,6 @@ private struct MiniAnalogClockView: View {
             let cy = canvasSize.height / 2
             let r = min(canvasSize.width, canvasSize.height) / 2 * 0.94
 
-            // Markierungen nur bei 12, 3, 6, 9
             for hour in [0, 3, 6, 9] {
                 let deg = Double(hour) / 12.0 * 360.0 - 90.0
                 let rad = deg * .pi / 180.0

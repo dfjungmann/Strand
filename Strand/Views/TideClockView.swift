@@ -111,7 +111,14 @@ struct TideClockView: View {
                 }
             }
         }
-        .onAppear { syncToLivePage(animated: false) }
+        .onAppear {
+            followLivePage = true
+            syncToLivePage(animated: false)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .clockTabReselected)) { _ in
+            followLivePage = true
+            syncToLivePage(animated: true)
+        }
         .onReceive(timer) { tick in
             now = tick
             if followLivePage {
@@ -154,9 +161,9 @@ struct TideClockView: View {
                 } else {
                     EbbeDayPhaseHorizonView(
                         ebbeTime: page.lowTide.adjustedTime,
-                        labelFontSize: r * 0.075
+                        referenceDay: page.lowTide.date
                     )
-                        .frame(width: r * 1.15, height: r * 1.05)
+                        .frame(width: r * 1.26, height: r * 1.26)
                         .position(x: cx, y: cy)
                 }
                 tideMarkerViews(cx: cx, cy: cy, r: r)

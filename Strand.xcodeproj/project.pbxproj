@@ -41,6 +41,7 @@
 		897E4881D139585E755DB2F3 /* TideComplicationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2134569F9DDE932452BE817A /* TideComplicationStore.swift */; };
 		94362AF0DA705C14FA45AD44 /* TideViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43493A1B112812438249B6F3 /* TideViewModel.swift */; };
 		9710D1C6517102085CDA3038 /* TideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA039B176B6568DDD9B77A63 /* TideModels.swift */; };
+		99492AE28BBDE9B9104B2C40 /* TabBarReselectObserver.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58871F548D4C7F6C1F387975 /* TabBarReselectObserver.swift */; };
 		9985AF055C67228E7520B004 /* WeatherForecastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20112AF67C07ECD8302FDC3E /* WeatherForecastView.swift */; };
 		A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E08E74456BF3AC82D99827E /* TableView.swift */; };
 		AC551121E977632D9351133F /* MarineService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D22D3CFB932B739BBA7EAB5 /* MarineService.swift */; };
@@ -135,6 +136,7 @@
 		4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideService.swift; sourceTree = "<group>"; };
 		53EE2D071A232010E553F17E /* WeatherMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherMapView.swift; sourceTree = "<group>"; };
 		5731F4DDEF77D0194D109D2E /* StrandWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StrandWatchWidgets.entitlements; sourceTree = "<group>"; };
+		58871F548D4C7F6C1F387975 /* TabBarReselectObserver.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarReselectObserver.swift; sourceTree = "<group>"; };
 		5EEBC1F2F904F87B154A7036 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		617429FD31CB0A7426760DAA /* WatchSettingsSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSettingsSync.swift; sourceTree = "<group>"; };
 		646EAA3BC0B6C60AA254A8B9 /* EbbeDayPhaseHorizonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EbbeDayPhaseHorizonView.swift; sourceTree = "<group>"; };
@@ -201,6 +203,7 @@
 				646EAA3BC0B6C60AA254A8B9 /* EbbeDayPhaseHorizonView.swift */,
 				6DA320BCC6F012E7541E2F43 /* NotificationsSettingsView.swift */,
 				EA028AEAC3247188CB0EB539 /* SettingsView.swift */,
+				58871F548D4C7F6C1F387975 /* TabBarReselectObserver.swift */,
 				8E08E74456BF3AC82D99827E /* TableView.swift */,
 				160E702BD8AD9974C80F88BA /* TideClockView.swift */,
 				BA96211DF067468998AF8E3A /* VerlaufView.swift */,
@@ -470,6 +473,7 @@
 				19ABC6393E9AEC6EEDC2F84C /* SettingsBackup.swift in Sources */,
 				DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */,
 				17E9C8DD1F965D0BDFEFDF14 /* StrandApp.swift in Sources */,
+				99492AE28BBDE9B9104B2C40 /* TabBarReselectObserver.swift in Sources */,
 				A75FDD29D391D0A08C73F022 /* TableView.swift in Sources */,
 				5D1B451585F927664C3CCB8F /* TideBeachWalk.swift in Sources */,
 				B62362ECC5E270434E48CAF2 /* TideCache.swift in Sources */,

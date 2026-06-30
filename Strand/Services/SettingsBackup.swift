@@ -22,6 +22,7 @@ enum SettingsBackup {
         "notif_prewalk_enabled", "notif_prewalk_hours", "notif_at_tide_enabled",
         "owm_api_key", "openai_api_key",
         "radar_intensity", "radar_default_location",
+        "last_selected_tab",
     ]
 
     struct Payload: Codable {

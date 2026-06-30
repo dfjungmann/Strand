@@ -50,9 +50,9 @@ struct AstronomyService {
     // MARK: - Sunrise / Sunset  (NOAA Solar Calculator algorithm)
 
     static func sunriseSunset(date: Date, lat: Double, lon: Double) -> (sunrise: Date?, sunset: Date?) {
-        var utcCal = Calendar(identifier: .gregorian)
-        utcCal.timeZone = TimeZone(identifier: "UTC")!
-        let c = utcCal.dateComponents([.year, .month, .day], from: date)
+        var localCal = Calendar(identifier: .gregorian)
+        localCal.timeZone = TideService.canaryIslandsTimeZone
+        let c = localCal.dateComponents([.year, .month, .day], from: date)
         guard let y = c.year, let m = c.month, let d = c.day else { return (nil, nil) }
 
         let jd = julianDay(year: y, month: m, day: d)
@@ -62,6 +62,8 @@ struct AstronomyService {
 
         func toDate(_ minutes: Double) -> Date? {
             guard minutes.isFinite else { return nil }
+            var utcCal = Calendar(identifier: .gregorian)
+            utcCal.timeZone = TimeZone(identifier: "UTC")!
             var base = DateComponents()
             base.year = y; base.month = m; base.day = d
             base.hour = 0; base.minute = 0; base.second = 0
