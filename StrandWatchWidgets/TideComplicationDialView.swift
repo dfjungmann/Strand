@@ -1,17 +1,18 @@
 import SwiftUI
 import WidgetKit
 
-/// Gefülltes Ringsegment für den Strandy-Bogen (unten, 6 Uhr).
+/// Gefülltes Ringsegment für den Strandy-Bogen (Uhrwinkel: 0° = oben, 180° = unten).
 private struct StrandyArcBand: Shape {
-    var spanDegrees: Double
+    var startClockAngleDeg: Double
+    var endClockAngleDeg: Double
 
     func path(in rect: CGRect) -> Path {
         let center = CGPoint(x: rect.midX, y: rect.midY)
         let maxR = min(rect.width, rect.height) * 0.48
         let outerR = maxR * 0.72
         let innerR = maxR * 0.52
-        let start = Angle.degrees(90.0 - spanDegrees)
-        let end = Angle.degrees(90.0 + spanDegrees)
+        let start = Angle.degrees(startClockAngleDeg - 90.0)
+        let end = Angle.degrees(endClockAngleDeg - 90.0)
 
         var path = Path()
         path.addArc(center: center, radius: outerR,
@@ -45,7 +46,7 @@ struct TideComplicationDialView: View {
     }
 
     private var showStrandyArc: Bool {
-        clock.cycleLowTide?.beachWalkStatus != BeachWalkStatus.none
+        clock.strandyArcWindow != nil
     }
 
     var body: some View {
@@ -91,21 +92,32 @@ struct TideComplicationDialView: View {
 
     @ViewBuilder
     private func strandyArc(size s: CGFloat) -> some View {
-        let low = clock.cycleLowTide
-        let status = low?.beachWalkStatus ?? BeachWalkStatus.none
-
-        if colorful {
-            let fill = TideBeachWalk.strandyArcFillColor(
-                rawHeight: low?.height ?? 0,
-                status: status
-            ).opacity(0.88)
-            StrandyArcBand(spanDegrees: clock.beachWalkArcSpan)
-                .fill(fill)
+        if let arc = clock.strandyArcWindow {
+            if colorful {
+                StrandyArcBand(
+                    startClockAngleDeg: arc.startClockAngleDeg,
+                    endClockAngleDeg: arc.endClockAngleDeg
+                )
+                .fill(
+                    TideBeachWalk.strandyArcAngularGradient(
+                        startClockAngleDeg: arc.startClockAngleDeg,
+                        endClockAngleDeg: arc.endClockAngleDeg,
+                        heightAtFraction: { fraction in
+                            let span = arc.endTime.timeIntervalSince(arc.startTime)
+                            let t = arc.startTime.addingTimeInterval(span * fraction)
+                            return clock.height(at: t) ?? 0
+                        }
+                    )
+                )
                 .widgetAccentable(false)
-        } else {
-            StrandyArcBand(spanDegrees: clock.beachWalkArcSpan)
+            } else {
+                StrandyArcBand(
+                    startClockAngleDeg: arc.startClockAngleDeg,
+                    endClockAngleDeg: arc.endClockAngleDeg
+                )
                 .fill(Color.primary.opacity(0.55))
                 .widgetAccentable(true)
+            }
         }
     }
 

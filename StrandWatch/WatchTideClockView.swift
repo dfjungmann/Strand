@@ -78,21 +78,27 @@ struct WatchTideClockView: View {
 
     @ViewBuilder
     private func tideHighRow(fontSize: CGFloat, width: CGFloat) -> some View {
-        if let high = clock.nextHighEvent {
-            tideEventLine(high, arrow: "↑", fontSize: fontSize, width: width)
+        if let displayed = clock.displayedHighTide {
+            tideEventLine(displayed, fontSize: fontSize, width: width)
         }
     }
 
     @ViewBuilder
     private func tideLowRow(fontSize: CGFloat, width: CGFloat) -> some View {
-        if let low = clock.nextLowEvent {
-            tideEventLine(low, arrow: "↓", fontSize: fontSize, width: width)
+        if let displayed = clock.displayedLowTide {
+            tideEventLine(displayed, fontSize: fontSize, width: width)
         }
     }
 
-    private func tideEventLine(_ event: TideEvent, arrow: String, fontSize: CGFloat, width: CGFloat) -> some View {
-        HStack(spacing: 1) {
-            Text("\(arrow)\(formatTime(event.adjustedTime, "HH:mm"))")
+    private func tideEventLine(
+        _ displayed: TideClockState.DisplayedTide,
+        fontSize: CGFloat,
+        width: CGFloat
+    ) -> some View {
+        let event = displayed.event
+        return HStack(spacing: 1) {
+            watchTideMarker(for: displayed)
+            Text(formatTime(event.adjustedTime, "HH:mm"))
                 .foregroundStyle(outerLabelTime)
             Text("|")
                 .foregroundStyle(outerLabelTime)
@@ -104,6 +110,16 @@ struct WatchTideClockView: View {
         .lineLimit(1)
         .minimumScaleFactor(0.55)
         .frame(maxWidth: width - 2)
+    }
+
+    @ViewBuilder
+    private func watchTideMarker(for displayed: TideClockState.DisplayedTide) -> some View {
+        let letter = displayed.recency == .past ? "a" : "n"
+        let color: Color = displayed.recency == .past
+            ? Color(red: 0.88, green: 0.12, blue: 0.10)
+            : Color(red: 0.15, green: 0.55, blue: 0.22)
+        Text(letter)
+            .foregroundStyle(color)
     }
 
     // MARK: - Face
@@ -122,21 +138,22 @@ struct WatchTideClockView: View {
                 with: .color(Color(red: 0.97, green: 0.98, blue: 1.0))
             )
 
-            if let lt = clock.cycleLowTide, lt.beachWalkStatus != .none {
-                let arcColor = TideBeachWalk.gradientColors(rawHeight: lt.height).background
-                    .opacity(0.75)
-                let span = clock.beachWalkArcSpan
-                let startDeg = 180.0 - span - 90.0
-                let endDeg = 180.0 + span - 90.0
-                let arcR = r * 0.66
-                var arc = Path()
-                arc.addArc(center: CGPoint(x: cx, y: cy),
-                           radius: arcR,
-                           startAngle: .degrees(startDeg),
-                           endAngle: .degrees(endDeg),
-                           clockwise: false)
-                ctx.stroke(arc, with: .color(arcColor),
-                           style: StrokeStyle(lineWidth: r * 0.18, lineCap: .butt))
+            if let arc = clock.strandyArcWindow {
+                let window = arc
+                TideBeachWalk.drawStrandyArcStroke(
+                    &ctx,
+                    cx: cx,
+                    cy: cy,
+                    arcRadius: r * 0.66,
+                    startClockAngleDeg: window.startClockAngleDeg,
+                    endClockAngleDeg: window.endClockAngleDeg,
+                    lineWidth: r * 0.18,
+                    heightAtFraction: { fraction in
+                        let span = window.endTime.timeIntervalSince(window.startTime)
+                        let t = window.startTime.addingTimeInterval(span * fraction)
+                        return clock.height(at: t) ?? 0
+                    }
+                )
             }
 
             let tickOuter = r * 0.76
@@ -257,11 +274,15 @@ struct WatchTideClockView: View {
     @ViewBuilder
     private func centerReadout(cx: CGFloat, cy: CGFloat, r: CGFloat) -> some View {
         let innerR = r * 0.78
-        let countdownSize = innerR * 0.40
+        let miniClockSize = innerR * 0.68
+        let countdownSize = innerR * 0.26
 
-        VStack(spacing: r * 0.01) {
+        MiniAnalogClockView(date: now, size: miniClockSize)
+            .position(x: cx, y: cy - r * 0.05 - miniClockSize * 0.60)
+
+        VStack(spacing: r * 0.008) {
             Text("noch")
-                .font(.system(size: countdownSize * 0.50, weight: .semibold))
+                .font(.system(size: countdownSize * 0.55, weight: .semibold))
                 .foregroundStyle(countdownGray)
 
             Text(countdownToNextExtreme)
@@ -269,7 +290,7 @@ struct WatchTideClockView: View {
                 .monospacedDigit()
                 .foregroundStyle(.black)
         }
-        .position(x: cx, y: cy)
+        .position(x: cx, y: cy + r * 0.14)
     }
 
     // MARK: - Formatting
@@ -296,4 +317,68 @@ struct WatchTideClockView: View {
 
 #Preview {
     WatchTideClockView(viewModel: WatchTideViewModel())
+}
+
+/// Kleine Analoguhr im Inneren der Gezeiten-Uhr (12/3/6/9, Stunden- + Minutenzeiger).
+private struct MiniAnalogClockView: View {
+    let date: Date
+    let size: CGFloat
+
+    private var hourAngle: Double {
+        let cal = Calendar.current
+        let h = Double(cal.component(.hour, from: date) % 12)
+        let m = Double(cal.component(.minute, from: date))
+        return (h + m / 60.0) / 12.0 * 360.0
+    }
+
+    private var minuteAngle: Double {
+        let m = Double(Calendar.current.component(.minute, from: date))
+        return m / 60.0 * 360.0
+    }
+
+    var body: some View {
+        Canvas { ctx, canvasSize in
+            let cx = canvasSize.width / 2
+            let cy = canvasSize.height / 2
+            let r = min(canvasSize.width, canvasSize.height) / 2 * 0.94
+
+            // Markierungen nur bei 12, 3, 6, 9
+            for hour in [0, 3, 6, 9] {
+                let deg = Double(hour) / 12.0 * 360.0 - 90.0
+                let rad = deg * .pi / 180.0
+                let tickLen = r * 0.18
+                let outer = r * 0.88
+                var tick = Path()
+                tick.move(to: CGPoint(x: cx + (outer - tickLen) * cos(rad),
+                                      y: cy + (outer - tickLen) * sin(rad)))
+                tick.addLine(to: CGPoint(x: cx + outer * cos(rad),
+                                         y: cy + outer * sin(rad)))
+                ctx.stroke(tick, with: .color(Color(white: 0.25)),
+                           style: StrokeStyle(lineWidth: max(1.5, r * 0.06), lineCap: .round))
+            }
+
+            drawHand(ctx, cx: cx, cy: cy, length: r * 0.52, width: max(2.0, r * 0.07),
+                     angleDeg: hourAngle, color: Color(white: 0.12))
+            drawHand(ctx, cx: cx, cy: cy, length: r * 0.72, width: max(1.5, r * 0.045),
+                     angleDeg: minuteAngle, color: Color(white: 0.12))
+
+            let hubR = max(2.0, r * 0.05)
+            ctx.fill(
+                Path(ellipseIn: CGRect(x: cx - hubR, y: cy - hubR, width: hubR * 2, height: hubR * 2)),
+                with: .color(Color(white: 0.12))
+            )
+        }
+        .frame(width: size, height: size)
+    }
+
+    private func drawHand(_ ctx: GraphicsContext, cx: CGFloat, cy: CGFloat,
+                          length: CGFloat, width: CGFloat, angleDeg: Double, color: Color) {
+        let rad = (angleDeg - 90.0) * .pi / 180.0
+        let tip = CGPoint(x: cx + length * cos(rad), y: cy + length * sin(rad))
+        var path = Path()
+        path.move(to: CGPoint(x: cx, y: cy))
+        path.addLine(to: tip)
+        ctx.stroke(path, with: .color(color),
+                   style: StrokeStyle(lineWidth: width, lineCap: .round))
+    }
 }
