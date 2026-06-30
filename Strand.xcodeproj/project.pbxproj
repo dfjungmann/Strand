@@ -55,6 +55,7 @@
 		D1BFE78C034265D4C26ABF51 /* TideBeachWalk.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3F045628D7FB3D502FFEF4AA /* TideBeachWalk.swift */; };
 		D5F544992D315DE0D5EE7866 /* TideService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4385D3CD3D3C80B9C3E8D8A5 /* TideService.swift */; };
 		D6BD4311E0DFF29AE6FF00AB /* StrandWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = D9E7796F55D72B945CB79CE5 /* StrandWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D7A8D56F86DBB26914AD35E7 /* EbbeDayPhase.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE265D3D485BF079A08614BA /* EbbeDayPhase.swift */; };
 		DECB0F5DF52D1F0D7730889B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA028AEAC3247188CB0EB539 /* SettingsView.swift */; };
 		DFEEDE4940121FF9261E6970 /* WatchConnectivity.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 00E41AA107D07C5B4C6FDD61 /* WatchConnectivity.framework */; };
 		E97F4B7A448AFD13A89997F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5EEBC1F2F904F87B154A7036 /* Assets.xcassets */; };
@@ -62,6 +63,7 @@
 		EBA80132D380106091978375 /* TideDisplaySettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C3FC20ED487699DD2E92D /* TideDisplaySettings.swift */; };
 		ED52E826DD5B362809C40075 /* DayDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 241225197FA8E158FACB743A /* DayDetailView.swift */; };
 		ED8AE0318A4C0BA70CC90F30 /* TideModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = FA039B176B6568DDD9B77A63 /* TideModels.swift */; };
+		F083717DE5484772E70707FF /* EbbeDayPhaseHorizonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646EAA3BC0B6C60AA254A8B9 /* EbbeDayPhaseHorizonView.swift */; };
 		F1E3F90B3AED83C985147F3B /* TideClockState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6849BA9D68145A456D98444 /* TideClockState.swift */; };
 		F81A7816FCC1A35AF625748B /* TideCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */; };
 		F93E00DCD240CAF855A32F18 /* DSEG7Classic-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2576DB5D56153025CC3DE178 /* DSEG7Classic-Bold.ttf */; };
@@ -114,7 +116,7 @@
 		098356A9AD4ECC4271276BAD /* StrandApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrandApp.swift; sourceTree = "<group>"; };
 		160E702BD8AD9974C80F88BA /* TideClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideClockView.swift; sourceTree = "<group>"; };
 		18FB5ACC469E5D5636D23FC8 /* ChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartView.swift; sourceTree = "<group>"; };
-		1F455BDF21623385D050052D /* Strand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		1F455BDF21623385D050052D /* Strand.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		20112AF67C07ECD8302FDC3E /* WeatherForecastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherForecastView.swift; sourceTree = "<group>"; };
 		2134569F9DDE932452BE817A /* TideComplicationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideComplicationStore.swift; sourceTree = "<group>"; };
 		241225197FA8E158FACB743A /* DayDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DayDetailView.swift; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 		5731F4DDEF77D0194D109D2E /* StrandWatchWidgets.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = StrandWatchWidgets.entitlements; sourceTree = "<group>"; };
 		5EEBC1F2F904F87B154A7036 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		617429FD31CB0A7426760DAA /* WatchSettingsSync.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchSettingsSync.swift; sourceTree = "<group>"; };
+		646EAA3BC0B6C60AA254A8B9 /* EbbeDayPhaseHorizonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EbbeDayPhaseHorizonView.swift; sourceTree = "<group>"; };
 		655480A363D527F0B8163CC2 /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
 		6DA320BCC6F012E7541E2F43 /* NotificationsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationsSettingsView.swift; sourceTree = "<group>"; };
 		71D7F4BEA0BD52EA3757D100 /* StrandWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StrandWatchApp.swift; sourceTree = "<group>"; };
@@ -151,6 +154,7 @@
 		D084D9B7FBC01A75A52C7A68 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		D9E7796F55D72B945CB79CE5 /* StrandWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StrandWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DCB295F2DDA0CF07227EF2F5 /* TideCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideCache.swift; sourceTree = "<group>"; };
+		DE265D3D485BF079A08614BA /* EbbeDayPhase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EbbeDayPhase.swift; sourceTree = "<group>"; };
 		EA028AEAC3247188CB0EB539 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		EDAE6690AE9518CC7E7A0215 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		F6849BA9D68145A456D98444 /* TideClockState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TideClockState.swift; sourceTree = "<group>"; };
@@ -194,6 +198,7 @@
 				428F75D0EA7C49E8B29C6687 /* BeachWalkView.swift */,
 				18FB5ACC469E5D5636D23FC8 /* ChartView.swift */,
 				241225197FA8E158FACB743A /* DayDetailView.swift */,
+				646EAA3BC0B6C60AA254A8B9 /* EbbeDayPhaseHorizonView.swift */,
 				6DA320BCC6F012E7541E2F43 /* NotificationsSettingsView.swift */,
 				EA028AEAC3247188CB0EB539 /* SettingsView.swift */,
 				8E08E74456BF3AC82D99827E /* TableView.swift */,
@@ -216,6 +221,7 @@
 		4B3D27C5CF4E00E9334AB072 /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				DE265D3D485BF079A08614BA /* EbbeDayPhase.swift */,
 				3F045628D7FB3D502FFEF4AA /* TideBeachWalk.swift */,
 				F6849BA9D68145A456D98444 /* TideClockState.swift */,
 				C54C3FC20ED487699DD2E92D /* TideDisplaySettings.swift */,
@@ -387,7 +393,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
-				LastUpgradeCheck = 2650;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					2A52A8FC1556440C59E4A1D8 = {
 						DevelopmentTeam = 47D76MD2KB;
@@ -455,6 +461,8 @@
 				5B898008E639EC3E8A4EEE38 /* ChartView.swift in Sources */,
 				1B1399EDF0D0A6181C31CD30 /* ContentView.swift in Sources */,
 				ED52E826DD5B362809C40075 /* DayDetailView.swift in Sources */,
+				D7A8D56F86DBB26914AD35E7 /* EbbeDayPhase.swift in Sources */,
+				F083717DE5484772E70707FF /* EbbeDayPhaseHorizonView.swift in Sources */,
 				48F62C4CEF76CCE46B1C3382 /* FlipClockFont.swift in Sources */,
 				AC551121E977632D9351133F /* MarineService.swift in Sources */,
 				4FE130B4E76739659B04E33C /* NotificationManager.swift in Sources */,
@@ -601,12 +609,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 47D76MD2KB;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -620,7 +626,6 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				SWIFT_VERSION = 5.9;
@@ -684,12 +689,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
-				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 47D76MD2KB;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -710,7 +713,6 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.9;

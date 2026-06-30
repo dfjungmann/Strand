@@ -151,6 +151,13 @@ struct TideClockView: View {
                         needleHeightLabel(cx: cx, cy: cy, r: r)
                     }
                     centerReadout(cx: cx, cy: cy, r: r)
+                } else {
+                    EbbeDayPhaseHorizonView(
+                        ebbeTime: page.lowTide.adjustedTime,
+                        labelFontSize: r * 0.075
+                    )
+                        .frame(width: r * 1.15, height: r * 1.05)
+                        .position(x: cx, y: cy)
                 }
                 tideMarkerViews(cx: cx, cy: cy, r: r)
                 if isLive {
